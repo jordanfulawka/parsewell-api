@@ -3,6 +3,7 @@ package com.jordanfulawka.parsewell.rest;
 
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class UserRestController {
 
     private UserService userService;
 
+    @Autowired
     public UserRestController(UserService userService) {
         this.userService = userService;
     }
