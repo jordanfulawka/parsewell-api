@@ -20,8 +20,8 @@ public class UserRestController {
     }
 
     @GetMapping("")
-    public List<User> getAllEmployees() {
-        return userService.findAll();
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @PostMapping("")

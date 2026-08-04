@@ -4,5 +4,6 @@ public enum ApplicationStatus {
     APPLIED,
     HEARD_BACK,
     REJECTED,
-    GHOSTED
+    GHOSTED,
+    PROCESSING
 }
