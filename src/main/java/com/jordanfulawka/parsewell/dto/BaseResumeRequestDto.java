@@ -3,14 +3,14 @@ package com.jordanfulawka.parsewell.dto;
 
 import java.util.UUID;
 
-public class BaseResumeDto {
+public class BaseResumeRequestDto {
 
     private UUID userId;
     private String label;
     private String content;
     private String originalFileURL;
 
-    public BaseResumeDto() {}
+    public BaseResumeRequestDto() {}
 
     public UUID getUserId() {
         return userId;

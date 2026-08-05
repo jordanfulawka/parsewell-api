@@ -1,6 +1,7 @@
 package com.jordanfulawka.parsewell.rest;
 
-import com.jordanfulawka.parsewell.dto.ApplicationDto;
+import com.anthropic.models.messages.Message;
+import com.jordanfulawka.parsewell.dto.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.entity.Application;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class ApplicationRestController {
     }
 
     @PostMapping("")
-    public Application createApplication(@RequestBody ApplicationDto applicationDto) {
-        return applicationService.createApplication(applicationDto);
+    public Application createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
+        return applicationService.createApplication(applicationRequestDto);
     }
 
     @GetMapping("")
@@ -29,5 +30,8 @@ public class ApplicationRestController {
         return applicationService.getAllApplications();
     }
 
-
+    @GetMapping("/generateEdits")
+    public Message generateEdits() {
+        return applicationService.generateEdits();
+    }
 }

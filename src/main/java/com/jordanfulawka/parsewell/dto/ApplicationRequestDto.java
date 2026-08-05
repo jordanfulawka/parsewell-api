@@ -5,7 +5,7 @@ import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
 
 import java.util.UUID;
 
-public class ApplicationDto {
+public class ApplicationRequestDto {
 
     private UUID userId;
     private UUID baseResumeId;
@@ -17,7 +17,7 @@ public class ApplicationDto {
     private ApplicationStatus applicationStatus;
     private String notes;
 
-    public ApplicationDto() {}
+    public ApplicationRequestDto() {}
 
     public UUID getUserId() {
         return userId;

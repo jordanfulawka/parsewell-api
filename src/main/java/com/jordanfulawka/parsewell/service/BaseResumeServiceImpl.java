@@ -1,6 +1,6 @@
 package com.jordanfulawka.parsewell.service;
 
-import com.jordanfulawka.parsewell.dto.BaseResumeDto;
+import com.jordanfulawka.parsewell.dto.BaseResumeRequestDto;
 import com.jordanfulawka.parsewell.entity.BaseResume;
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.repository.BaseResumeRepository;
@@ -29,14 +29,14 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     }
 
     @Override
-    public BaseResume createBaseResume(BaseResumeDto baseResumeDto) {
-        User user = userRepository.findById(baseResumeDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(("User not found")));
+    public BaseResume createBaseResume(BaseResumeRequestDto baseResumeRequestDto) {
+        User user = userRepository.findById(baseResumeRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(("User not found")));
 
         BaseResume baseResume = new BaseResume();
         baseResume.setUser(user);
-        baseResume.setLabel(baseResumeDto.getLabel());
-        baseResume.setContent(baseResumeDto.getContent());
-        baseResume.setOriginalFileURL(baseResumeDto.getOriginalFileURL());
+        baseResume.setLabel(baseResumeRequestDto.getLabel());
+        baseResume.setContent(baseResumeRequestDto.getContent());
+        baseResume.setOriginalFileURL(baseResumeRequestDto.getOriginalFileURL());
 
         return baseResumeRepository.save(baseResume);
     }
