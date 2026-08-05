@@ -18,16 +18,16 @@ public class EditSuggestion {
     @JoinColumn(name="application_id")
     private Application application;
 
-    @Column(name="section")
+    @Column(name="section", columnDefinition = "TEXT")
     private String section;
 
-    @Column(name="before_text")
+    @Column(name="before_text", columnDefinition = "TEXT")
     private String beforeText;
 
-    @Column(name="after_text")
+    @Column(name="after_text", columnDefinition = "TEXT")
     private String afterText;
 
-    @Column(name="reason")
+    @Column(name="reason", columnDefinition = "TEXT")
     private String reason;
 
     @Enumerated(EnumType.STRING)

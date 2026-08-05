@@ -1,6 +1,5 @@
 package com.jordanfulawka.parsewell.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationChannel;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
 import jakarta.persistence.*;
@@ -19,14 +18,12 @@ public class Application {
     @Column(name="id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, Cascade)
     @JoinColumn(name="user_id")
-    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="base_resume_id")
-    @JsonIgnore
     private BaseResume baseResume;
 
     @Column(name="company_name")

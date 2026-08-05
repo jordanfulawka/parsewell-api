@@ -6,9 +6,11 @@ import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
 import com.anthropic.models.messages.Model;
 import com.jordanfulawka.parsewell.dto.EditSuggestionAiResponseDto;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -60,8 +62,33 @@ public class ClaudeServiceImpl implements ClaudeService{
 
         Message message = client.messages().create(params);
         System.out.println(message.content());
-        return message;
+        List<EditSuggestionAiResponseDto> aiResponse = getEditSuggestionAiResponseDtos();
+        return aiResponse;
     }
+
+    private static @NonNull List<EditSuggestionAiResponseDto> getEditSuggestionAiResponseDtos() {
+        List<EditSuggestionAiResponseDto> aiResponse = new ArrayList<>();
+        EditSuggestionAiResponseDto es1 = new EditSuggestionAiResponseDto(
+                "summary",
+                "Recent Computing graduate with experience in full-stack development, seeking software engineering opportunities.",
+                "Full-stack software engineer with three co-op terms building production features on a live enterprise platform (BASF AgPro), now deepening backend expertise in Java/Spring Boot. Strong foundation in REST API design, relational data modeling, and cloud deployment.",
+                "JD opens by emphasizing 'backend-focused engineers with enterprise platform experience' — summary should lead with that instead of generic full-stack framing",
+                "REPLACE",
+                0
+        );
+        EditSuggestionAiResponseDto es2 = new EditSuggestionAiResponseDto(
+                "Experience - Kenna (Application Developer)",
+                "Built features for the BASF AgPro platform using React and Node.js.",
+                "Built and shipped backend REST endpoints and React front-end features for the BASF AgPro platform, working across a Node.js/Express service layer backed by SQL Server, deployed via AWS.",
+                "JD lists 'REST API development' and 'relational databases' as required skills — original bullet undersells the backend/API work you actually did",
+                "REPLACE",
+                1
+        );
+        aiResponse.add(es1);
+        aiResponse.add(es2);
+        return aiResponse;
+    }
+
 
     @Override
     public String generateCoverLetter(String baseResumeContent, String jobDescription) {

@@ -1,13 +1,14 @@
 package com.jordanfulawka.parsewell.rest;
 
-import com.anthropic.models.messages.Message;
 import com.jordanfulawka.parsewell.dto.ApplicationRequestDto;
+import com.jordanfulawka.parsewell.dto.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.entity.Application;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/applications")
@@ -30,8 +31,8 @@ public class ApplicationRestController {
         return applicationService.getAllApplications();
     }
 
-    @GetMapping("/generateEdits")
-    public Message generateEdits() {
-        return applicationService.generateEdits();
+    @PostMapping("/{id}/generate-edits")
+    public List<EditSuggestionResponse> generateEdits(@PathVariable UUID id) {
+        return applicationService.generateEditSuggestions(id);
     }
 }
