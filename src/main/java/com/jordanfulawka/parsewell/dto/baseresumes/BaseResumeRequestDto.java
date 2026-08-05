@@ -1,4 +1,4 @@
-package com.jordanfulawka.parsewell.dto;
+package com.jordanfulawka.parsewell.dto.baseresumes;
 
 
 import java.util.UUID;

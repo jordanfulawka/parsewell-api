@@ -1,8 +1,9 @@
 package com.jordanfulawka.parsewell.service;
 
-import com.jordanfulawka.parsewell.dto.ApplicationRequestDto;
-import com.jordanfulawka.parsewell.dto.EditSuggestionAiResponseDto;
-import com.jordanfulawka.parsewell.dto.EditSuggestionResponse;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.entity.Application;
 import com.jordanfulawka.parsewell.entity.BaseResume;
 import com.jordanfulawka.parsewell.entity.EditSuggestion;
@@ -44,17 +45,20 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public Application save(Application application) {
-        return applicationRepository.save(application);
+    public List<ApplicationResponseDto> getAllApplications() {
+
+        List<Application> applications = applicationRepository.findAll();
+        List<ApplicationResponseDto> responses = new ArrayList<>();
+
+        for(Application application : applications) {
+            responses.add(mapToResponse(application));
+        }
+
+        return responses;
     }
 
     @Override
-    public List<Application> getAllApplications() {
-        return applicationRepository.findAll();
-    }
-
-    @Override
-    public Application createApplication(ApplicationRequestDto applicationRequestDto) {
+    public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
 
         User user = userRepository.findById(applicationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         BaseResume baseResume = baseResumeRepository.findById(applicationRequestDto.getBaseResumeId()).orElseThrow(() -> new EntityNotFoundException("Base resume not found"));
@@ -70,7 +74,9 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setApplicationStatus(applicationRequestDto.getApplicationStatus());
         application.setNotes(application.getNotes());
 
-        return applicationRepository.save(application);
+        application = applicationRepository.save(application);
+
+        return mapToResponse(application);
     }
 
     @Override
@@ -114,6 +120,16 @@ public class ApplicationServiceImpl implements ApplicationService{
         return new EditSuggestionResponse(
                 editSuggestion.getId(), editSuggestion.getSection(), editSuggestion.getBeforeText(),
                 editSuggestion.getAfterText(), editSuggestion.getReason(), editSuggestion.getEditType(), editSuggestion.getOrderIndex()
+        );
+    }
+
+    private ApplicationResponseDto mapToResponse(Application application) {
+        return new ApplicationResponseDto(
+                application.getId(), application.getUser().getId(),
+                application.getBaseResume().getId(), application.getCompanyName(),
+                application.getRoleTitle(), application.getJobURL(), application.getJobDescription(),
+                application.getApplicationChannel(), application.getApplicationStatus(), application.getNotes(),
+                application.getCreatedAt(), application.getUpdatedAt()
         );
     }
 

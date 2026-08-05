@@ -1,6 +1,6 @@
 package com.jordanfulawka.parsewell.service.ai;
 
-import com.jordanfulawka.parsewell.dto.EditSuggestionAiResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 
 import java.util.List;
 

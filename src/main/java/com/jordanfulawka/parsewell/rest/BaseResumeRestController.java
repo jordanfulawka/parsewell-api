@@ -1,7 +1,7 @@
 package com.jordanfulawka.parsewell.rest;
 
-import com.jordanfulawka.parsewell.dto.BaseResumeRequestDto;
-import com.jordanfulawka.parsewell.entity.BaseResume;
+import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
+import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.service.BaseResumeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +18,12 @@ public class BaseResumeRestController {
     }
 
     @PostMapping("")
-    public BaseResume createBaseResume(@RequestBody BaseResumeRequestDto baseResumeRequestDto) {
+    public BaseResumeResponseDto createBaseResume(@RequestBody BaseResumeRequestDto baseResumeRequestDto) {
         return baseResumeService.createBaseResume(baseResumeRequestDto);
     }
 
     @GetMapping("")
-    public List<BaseResume> getAllBaseResumes() {
+    public List<BaseResumeResponseDto> getAllBaseResumes() {
         return baseResumeService.getAllBaseResumes();
     }
 }

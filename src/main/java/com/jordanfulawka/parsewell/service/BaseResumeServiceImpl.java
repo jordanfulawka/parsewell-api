@@ -1,6 +1,7 @@
 package com.jordanfulawka.parsewell.service;
 
-import com.jordanfulawka.parsewell.dto.BaseResumeRequestDto;
+import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
+import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.entity.BaseResume;
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.repository.BaseResumeRepository;
@@ -9,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,12 +26,7 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     }
 
     @Override
-    public BaseResume save(BaseResume baseResume) {
-        return baseResumeRepository.save(baseResume);
-    }
-
-    @Override
-    public BaseResume createBaseResume(BaseResumeRequestDto baseResumeRequestDto) {
+    public BaseResumeResponseDto createBaseResume(BaseResumeRequestDto baseResumeRequestDto) {
         User user = userRepository.findById(baseResumeRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(("User not found")));
 
         BaseResume baseResume = new BaseResume();
@@ -38,11 +35,26 @@ public class BaseResumeServiceImpl implements BaseResumeService{
         baseResume.setContent(baseResumeRequestDto.getContent());
         baseResume.setOriginalFileURL(baseResumeRequestDto.getOriginalFileURL());
 
-        return baseResumeRepository.save(baseResume);
+        baseResume = baseResumeRepository.save(baseResume);
+        return mapToResponse(baseResume);
     }
 
     @Override
-    public List<BaseResume> getAllBaseResumes() {
-        return baseResumeRepository.findAll();
+    public List<BaseResumeResponseDto> getAllBaseResumes() {
+        List<BaseResume> baseResumes = baseResumeRepository.findAll();
+        List<BaseResumeResponseDto> responses = new ArrayList<>();
+
+        for(BaseResume baseResume : baseResumes) {
+            responses.add(mapToResponse(baseResume));
+        }
+        return responses;
+    }
+
+    private BaseResumeResponseDto mapToResponse(BaseResume baseResume) {
+        return new BaseResumeResponseDto(
+                baseResume.getId(), baseResume.getUser().getId(),
+                baseResume.getLabel(), baseResume.getContent(),
+                baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
+        );
     }
 }

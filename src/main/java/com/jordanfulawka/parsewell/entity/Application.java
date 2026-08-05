@@ -18,7 +18,7 @@ public class Application {
     @Column(name="id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, Cascade)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 

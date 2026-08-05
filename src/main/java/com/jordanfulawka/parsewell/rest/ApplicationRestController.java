@@ -1,8 +1,8 @@
 package com.jordanfulawka.parsewell.rest;
 
-import com.jordanfulawka.parsewell.dto.ApplicationRequestDto;
-import com.jordanfulawka.parsewell.dto.EditSuggestionResponse;
-import com.jordanfulawka.parsewell.entity.Application;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +22,12 @@ public class ApplicationRestController {
     }
 
     @PostMapping("")
-    public Application createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
+    public ApplicationResponseDto createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
         return applicationService.createApplication(applicationRequestDto);
     }
 
     @GetMapping("")
-    public List<Application> getAllApplications() {
+    public List<ApplicationResponseDto> getAllApplications() {
         return applicationService.getAllApplications();
     }
 

@@ -5,7 +5,7 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
 import com.anthropic.models.messages.Model;
-import com.jordanfulawka.parsewell.dto.EditSuggestionAiResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

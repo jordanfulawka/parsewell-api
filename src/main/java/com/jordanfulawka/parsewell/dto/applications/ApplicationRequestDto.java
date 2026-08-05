@@ -1,4 +1,4 @@
-package com.jordanfulawka.parsewell.dto;
+package com.jordanfulawka.parsewell.dto.applications;
 
 import com.jordanfulawka.parsewell.entity.enums.ApplicationChannel;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
