@@ -19,7 +19,7 @@ public class GeneratedCoverLetter {
     @JoinColumn(name="application_id", unique = true)
     private Application application;
 
-    @Column(name="content")
+    @Column(name="content", columnDefinition = "TEXT")
     private String content;
 
     @CreationTimestamp

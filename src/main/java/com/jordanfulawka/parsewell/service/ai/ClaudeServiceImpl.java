@@ -3,7 +3,9 @@ package com.jordanfulawka.parsewell.service.ai;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.models.messages.*;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
+import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionsResponse;
+import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,7 @@ import java.util.List;
 @Service
 public class ClaudeServiceImpl implements ClaudeService{
 
-    private AnthropicClient client;
+    private final AnthropicClient client;
 
     @Autowired
     public ClaudeServiceImpl(AnthropicClient client) {
@@ -37,14 +39,15 @@ public class ClaudeServiceImpl implements ClaudeService{
 
         StructuredMessageCreateParams<EditSuggestionsResponse> params = MessageCreateParams.builder()
                 .model(Model.CLAUDE_HAIKU_4_5)
-                .maxTokens(1024L)
+                .maxTokens(4096L)
                 .systemOfTextBlockParams(List.of(
                         TextBlockParam.builder()
                                 .text(systemPrompt)
                                 .cacheControl(CacheControlEphemeral.builder().build())
                                 .build()))
                 .outputConfig(EditSuggestionsResponse.class)
-                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription)
+//                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription)
+                .addUserMessage("this is just a test. please generate some mock examples and output them for a standard tech job")
                 .build();
 
         StructuredMessage<EditSuggestionsResponse> message = client.messages().create(params);
@@ -54,13 +57,60 @@ public class ClaudeServiceImpl implements ClaudeService{
                 .findFirst()
                 .map(StructuredTextBlock::text)
                 .map(EditSuggestionsResponse::editSuggestions)
-                .orElseThrow(() -> new IllegalStateException("Claude returned no structured content"));
+                .orElseThrow();
     }
 
 
     @Override
-    public String generateCoverLetter(String baseResumeContent, String jobDescription) {
+    public GeneratedCoverLetterResponse generateCoverLetter(String baseResumeContent, String jobDescription, List<EditSuggestionResponse> suggestions) {
+        String systemPrompt = "You are an expert cover letter writer helping a software engineering candidate \n" +
+                "apply for jobs. You write in the candidate's established voice: natural but \n" +
+                "professional, conversational but polished. \n" +
+                "\n" +
+                "Strict rules:\n" +
+                "- No em dashes, ever\n" +
+                "- No filler phrases (\"I am excited to apply,\" \"I believe I would be a great fit,\" \n" +
+                "  \"I am confident that\")\n" +
+                "- No idioms or clichés (\"hit the ground running,\" \"wear many hats,\" \"team player\")\n" +
+                "- No invented facts, metrics, or experience — use only what appears in the \n" +
+                "  provided resume content\n" +
+                "- Do not restate the job description back at the candidate; use it to select \n" +
+                "  which of the candidate's real experiences are most relevant\n" +
+                "- Write like a competent person explaining why they're a good fit, not like a \n" +
+                "  template being filled in\n" +
+                "\n" +
+                "Structure:\n" +
+                "- Opening: state the role and company plainly, one sentence on why this role \n" +
+                "  specifically caught their interest (grounded in something concrete from the \n" +
+                "  job description, not generic enthusiasm)\n" +
+                "- Body (1-2 paragraphs): 2-3 specific, relevant pieces of experience from the \n" +
+                "  resume, tied directly to what the job description asks for. Prefer concrete \n" +
+                "  detail (technologies, scope, outcomes) over vague claims of skill\n" +
+                "- Closing: brief, direct. No \"I look forward to hearing from you\" boilerplate — \n" +
+                "  something more specific to the role/company if possible\n" +
+                "\n" +
+                "Length: 250-350 words. This is a letter a person would actually send, not a \n" +
+                "maximal showcase of everything on the resume.";
 
-        return "";
+        StructuredMessageCreateParams<GeneratedCoverLetterResponse> params = MessageCreateParams.builder()
+                .model(Model.CLAUDE_HAIKU_4_5)
+                .maxTokens(4096L)
+                .systemOfTextBlockParams(List.of(
+                        TextBlockParam.builder()
+                                .text(systemPrompt)
+                                .cacheControl(CacheControlEphemeral.builder().build())
+                                .build()))
+                .outputConfig(GeneratedCoverLetterResponse.class)
+//                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription + "\n\n---\n\n" + suggestions)
+                .addUserMessage("this is just a test, i dont have any actual information for you, so just write anything! write me a little bit about some facts about space")
+                .build();
+
+        StructuredMessage<GeneratedCoverLetterResponse> message = client.messages().create(params);
+
+        System.out.println(message);
+
+        return message.content().stream()
+                .flatMap(block -> block.text().stream())
+                .findFirst().orElseThrow().text();
     }
 }

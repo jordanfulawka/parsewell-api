@@ -4,15 +4,10 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
-import com.jordanfulawka.parsewell.entity.Application;
-import com.jordanfulawka.parsewell.entity.BaseResume;
-import com.jordanfulawka.parsewell.entity.EditSuggestion;
-import com.jordanfulawka.parsewell.entity.User;
+import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
+import com.jordanfulawka.parsewell.entity.*;
 import com.jordanfulawka.parsewell.entity.enums.EditType;
-import com.jordanfulawka.parsewell.repository.ApplicationRepository;
-import com.jordanfulawka.parsewell.repository.BaseResumeRepository;
-import com.jordanfulawka.parsewell.repository.EditSuggestionRepository;
-import com.jordanfulawka.parsewell.repository.UserRepository;
+import com.jordanfulawka.parsewell.repository.*;
 import com.jordanfulawka.parsewell.service.ai.ClaudeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +20,26 @@ import java.util.UUID;
 @Service
 public class ApplicationServiceImpl implements ApplicationService{
 
-    private ApplicationRepository applicationRepository;
-    private UserRepository userRepository;
-    private BaseResumeRepository baseResumeRepository;
-    private ClaudeService claudeService;
-    private EditSuggestionRepository editSuggestionRepository;
+    private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
+    private final BaseResumeRepository baseResumeRepository;
+    private final ClaudeService claudeService;
+    private final EditSuggestionRepository editSuggestionRepository;
+    private final GeneratedCoverLetterRepository generatedCoverLetterRepository;
 
     @Autowired
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
                                   UserRepository userRepository,
                                   BaseResumeRepository baseResumeRepository,
                                   ClaudeService claudeService,
-                                  EditSuggestionRepository editSuggestionRepository) {
+                                  EditSuggestionRepository editSuggestionRepository,
+                                  GeneratedCoverLetterRepository generatedCoverLetterRepository) {
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
         this.baseResumeRepository = baseResumeRepository;
         this.claudeService = claudeService;
         this.editSuggestionRepository = editSuggestionRepository;
+        this.generatedCoverLetterRepository = generatedCoverLetterRepository;
     }
 
     @Override
@@ -95,13 +93,38 @@ public class ApplicationServiceImpl implements ApplicationService{
             suggestions.add(mapToEntity(response, application));
         }
 
-        List<EditSuggestion> saved =editSuggestionRepository.saveAll(suggestions);
+        List<EditSuggestion> saved = editSuggestionRepository.saveAll(suggestions);
 
         List<EditSuggestionResponse> responses = new ArrayList<>();
         for(EditSuggestion suggestion : suggestions) {
             responses.add(mapToResponse(suggestion));
         }
         return responses;
+    }
+
+    @Override
+    public GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId) {
+
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application cannot be found"));
+        BaseResume baseResume = application.getBaseResume();
+        List<EditSuggestion> rawSuggestions = editSuggestionRepository.findAllByApplicationId(applicationId);
+
+        List<EditSuggestionResponse> suggestions = new ArrayList<>();
+
+        for(EditSuggestion suggestion : rawSuggestions) {
+            suggestions.add(mapToResponse(suggestion));
+        }
+
+        GeneratedCoverLetterResponse generatedCoverLetterResponse = claudeService.generateCoverLetter(
+                baseResume.getContent(),
+                application.getJobDescription(),
+                suggestions
+        );
+
+        GeneratedCoverLetter generatedCoverLetter = mapToEntity(generatedCoverLetterResponse, application);
+        generatedCoverLetterRepository.save(generatedCoverLetter);
+
+        return generatedCoverLetterResponse;
     }
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
@@ -131,6 +154,13 @@ public class ApplicationServiceImpl implements ApplicationService{
                 application.getApplicationChannel(), application.getApplicationStatus(), application.getNotes(),
                 application.getCreatedAt(), application.getUpdatedAt()
         );
+    }
+
+    private GeneratedCoverLetter mapToEntity(GeneratedCoverLetterResponse generatedCoverLetterResponse, Application application) {
+        GeneratedCoverLetter generatedCoverLetter = new GeneratedCoverLetter();
+        generatedCoverLetter.setApplication(application);
+        generatedCoverLetter.setContent(generatedCoverLetterResponse.content());
+        return generatedCoverLetter;
     }
 
 }
