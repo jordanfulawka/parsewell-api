@@ -118,7 +118,7 @@ public class ApplicationServiceImpl implements ApplicationService{
 
     private EditSuggestionResponse mapToResponse(EditSuggestion editSuggestion) {
         return new EditSuggestionResponse(
-                editSuggestion.getId(), editSuggestion.getSection(), editSuggestion.getBeforeText(),
+                editSuggestion.getId(), editSuggestion.getApplication().getId() ,editSuggestion.getSection(), editSuggestion.getBeforeText(),
                 editSuggestion.getAfterText(), editSuggestion.getReason(), editSuggestion.getEditType(), editSuggestion.getOrderIndex()
         );
     }
