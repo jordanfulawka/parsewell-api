@@ -4,6 +4,7 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
+import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +41,10 @@ public class ApplicationRestController {
     @PostMapping("/{id}/generate-cover-letter")
     public GeneratedCoverLetterResponse generateCoverLetter(@PathVariable UUID id) {
         return applicationService.generateCoverLetter(id);
+    }
+
+    @PostMapping("/{id}/upload-final-materials")
+    public FinalMaterialDto uploadFinalMaterials(@PathVariable UUID id, @RequestBody FinalMaterialDto finalMaterialDto) {
+        return applicationService.saveFinalMaterials(id, finalMaterialDto);
     }
 }

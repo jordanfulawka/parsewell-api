@@ -5,6 +5,7 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
+import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
 import com.jordanfulawka.parsewell.entity.*;
 import com.jordanfulawka.parsewell.entity.enums.EditType;
 import com.jordanfulawka.parsewell.repository.*;
@@ -26,6 +27,7 @@ public class ApplicationServiceImpl implements ApplicationService{
     private final ClaudeService claudeService;
     private final EditSuggestionRepository editSuggestionRepository;
     private final GeneratedCoverLetterRepository generatedCoverLetterRepository;
+    private final FinalMaterialRepository finalMaterialRepository;
 
     @Autowired
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
@@ -33,13 +35,15 @@ public class ApplicationServiceImpl implements ApplicationService{
                                   BaseResumeRepository baseResumeRepository,
                                   ClaudeService claudeService,
                                   EditSuggestionRepository editSuggestionRepository,
-                                  GeneratedCoverLetterRepository generatedCoverLetterRepository) {
+                                  GeneratedCoverLetterRepository generatedCoverLetterRepository,
+                                  FinalMaterialRepository finalMaterialRepository) {
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
         this.baseResumeRepository = baseResumeRepository;
         this.claudeService = claudeService;
         this.editSuggestionRepository = editSuggestionRepository;
         this.generatedCoverLetterRepository = generatedCoverLetterRepository;
+        this.finalMaterialRepository = finalMaterialRepository;
     }
 
     @Override
@@ -125,6 +129,19 @@ public class ApplicationServiceImpl implements ApplicationService{
         generatedCoverLetterRepository.save(generatedCoverLetter);
 
         return generatedCoverLetterResponse;
+    }
+
+    @Override
+    public FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto dto) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application not found"));
+
+        FinalMaterial finalMaterial = new FinalMaterial();
+        finalMaterial.setApplication(application);
+        finalMaterial.setResumeURL(dto.resumeURL());
+        finalMaterial.setCoverLetterURL(dto.coverLetterURL());
+        finalMaterialRepository.save(finalMaterial);
+
+        return dto;
     }
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
