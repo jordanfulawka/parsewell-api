@@ -34,24 +34,24 @@ public class AuthenticationRestController {
     public String authenticateUser(@RequestBody User user) {
         Authentication authentication = authenticationManager.authenticate(
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                        user.getUsername(),
+                        user.getEmail(),
                         user.getPassword()
                 )
         );
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtil.generateToken(userDetails.getUsername());
+        User foundUser = userRepository.findByEmail(user.getEmail());
+        return jwtUtil.generateToken(foundUser.getId(), foundUser.getFirstName(), foundUser.getEmail());
     }
 
     @PostMapping("/signup")
     public String registerUser(@RequestBody User user) {
-        if(userRepository.existsByUsername(user.getUsername())) {
+        if(userRepository.existsByEmail(user.getEmail())) {
             return "User already exists";
         }
 
         final User newUser = new User(
                 user.getFirstName(),
                 user.getEmail(),
-                user.getUsername(),
                 passwordEncoder.encode(user.getPassword())
         );
         userRepository.save(newUser);
