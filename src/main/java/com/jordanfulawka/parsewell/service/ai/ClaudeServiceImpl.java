@@ -47,8 +47,8 @@ public class ClaudeServiceImpl implements ClaudeService{
                                 .cacheControl(CacheControlEphemeral.builder().build())
                                 .build()))
                 .outputConfig(EditSuggestionsResponse.class)
-//                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription)
-                .addUserMessage("this is just a test. please generate some mock examples and output them for a standard tech job")
+                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription)
+//                .addUserMessage("this is just a test. please generate some mock examples and output them for a standard tech job")
                 .build();
 
         StructuredMessage<EditSuggestionsResponse> message = client.messages().create(params);
@@ -102,8 +102,8 @@ public class ClaudeServiceImpl implements ClaudeService{
                                 .cacheControl(CacheControlEphemeral.builder().build())
                                 .build()))
                 .outputConfig(GeneratedCoverLetterResponse.class)
-//                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription + "\n\n---\n\n" + suggestions)
-                .addUserMessage("this is just a test, i dont have any actual information for you, so just write anything! write me a little bit about some facts about space")
+                .addUserMessage(baseResumeContent + "\n\n---\n\n" + jobDescription + "\n\n---\n\n" + suggestions)
+//                .addUserMessage("this is just a test, i dont have any actual information for you, so just write anything! write me a little bit about some facts about space")
                 .build();
 
         StructuredMessage<GeneratedCoverLetterResponse> message = client.messages().create(params);

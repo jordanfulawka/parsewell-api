@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -18,11 +19,13 @@ import java.time.Duration;
 public class S3ServiceImpl implements S3Service {
 
     private static final Logger log = LoggerFactory.getLogger(S3ServiceImpl.class);
-    private S3Presigner presigner;
+    private final S3Presigner presigner;
+    private final S3Client client;
 
 
     @Autowired
-    public S3ServiceImpl(S3Presigner s3Presigner) {
+    public S3ServiceImpl(S3Client s3Client, S3Presigner s3Presigner) {
+        this.client = s3Client;
         this.presigner = s3Presigner;
     }
 
@@ -73,4 +76,17 @@ public class S3ServiceImpl implements S3Service {
             return "error";
         }
     }
+
+    @Override
+    public byte[] downloadObject(String key) {
+
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket("parsewell-material-uploads")
+                .key(key)
+                .build();
+
+        return client.getObjectAsBytes(objectRequest).asByteArray();
+    }
+
+
 }
