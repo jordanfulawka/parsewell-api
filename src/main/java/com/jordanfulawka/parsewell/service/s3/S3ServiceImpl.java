@@ -1,18 +1,21 @@
-package com.jordanfulawka.parsewell.service;
+package com.jordanfulawka.parsewell.service.s3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
 
 @Service
-public class S3ServiceImpl implements S3Service{
+public class S3ServiceImpl implements S3Service {
 
     private static final Logger log = LoggerFactory.getLogger(S3ServiceImpl.class);
     private S3Presigner presigner;
@@ -25,10 +28,9 @@ public class S3ServiceImpl implements S3Service{
 
 
     @Override
-    public String createPresignedUrl(String key) {
+    public String createPresignedPutUrl(String key) {
         try {
 
-            System.out.println(presigner);
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
                     .key(key)
@@ -41,6 +43,31 @@ public class S3ServiceImpl implements S3Service{
 
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
             return presignedRequest.url().toExternalForm();
+        } catch (Exception e) {
+            log.error("e: ", e);
+            return "error";
+        }
+    }
+
+    @Override
+    public String createPresignedGetUrl(String key) {
+        try {
+
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket("parsewell-material-uploads")
+                    .key(key)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .getObjectRequest(objectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+
+            return presignedRequest.url().toExternalForm();
+
+
         } catch (Exception e) {
             log.error("e: ", e);
             return "error";
