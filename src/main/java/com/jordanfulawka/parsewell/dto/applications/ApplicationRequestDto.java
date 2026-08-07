@@ -11,6 +11,7 @@ public class ApplicationRequestDto {
     private UUID baseResumeId;
     private String companyName;
     private String roleTitle;
+    private String location;
     private String jobURL;
     private String jobDescription;
     private ApplicationChannel applicationChannel;
@@ -45,6 +46,14 @@ public class ApplicationRequestDto {
 
     public String getRoleTitle() {
         return roleTitle;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public void setRoleTitle(String roleTitle) {

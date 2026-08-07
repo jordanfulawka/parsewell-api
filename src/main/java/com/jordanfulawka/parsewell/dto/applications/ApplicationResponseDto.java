@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ApplicationResponseDto(
-        UUID id, UUID userId, UUID baseResumeId, String companyName, String roleTitle, String jobURL, String jobDescription,
+        UUID id, UUID userId, UUID baseResumeId, String companyName, String roleTitle, String location, String jobURL, String jobDescription,
         ApplicationChannel applicationChannel, ApplicationStatus applicationStatus, String notes, LocalDateTime createdAt, LocalDateTime updatedAt
 ) {
 }

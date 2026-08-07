@@ -6,6 +6,7 @@ import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseD
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionsResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
+import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -108,6 +109,44 @@ public class ClaudeServiceImpl implements ClaudeService{
         StructuredMessage<GeneratedCoverLetterResponse> message = client.messages().create(params);
 
         System.out.println(message);
+
+        return message.content().stream()
+                .flatMap(block -> block.text().stream())
+                .findFirst().orElseThrow().text();
+    }
+
+    @Override
+    public JobPostingResponse parseJobPosting(String pageText) {
+        String systemPrompt = "You are a data extraction assistant. You will be given raw text scraped from a job posting web page.\n" +
+                "\n" +
+                "The input text follows this format:\n" +
+                "- Line 1: the page title\n" +
+                "- Line 2: the page URL\n" +
+                "- Remaining lines: the page body content\n" +
+                "\n" +
+                "Extract the following fields:\n" +
+                "\n" +
+                "- companyName: The hiring company's name, using the most specific, correctly capitalized form found in the text (e.g., \"Scotiabank\" not \"SCOTIABANK CAREERS\").\n" +
+                "- roleTitle: The job title/position being advertised, as written in the posting (e.g., \"Software Engineer I\", \"Backend Developer Co-op\").\n" +
+                "- location: The job's location as stated in the posting (e.g., \"Toronto, ON\", \"Remote\", \"New York, NY (Hybrid)\"). If multiple locations are listed, use the primary/first one. If not stated, return an empty string.\n" +
+                "- jobURL: Use the URL given on line 2 of the input text, verbatim.\n" +
+                "- jobDescription: The full job description content — responsibilities, qualifications, requirements, and other role-relevant text. Exclude navigation menus, cookie banners, unrelated site chrome, \"related jobs\" sections, and boilerplate footer/legal text. Preserve paragraph and bullet structure with \\n where it aids readability, but do not fabricate structure that wasn't present in the source.\n" +
+                "\n" +
+                "If a field cannot be confidently determined from the text, return an empty string \"\" for that field rather than guessing or hallucinating a value.";
+
+        StructuredMessageCreateParams<JobPostingResponse> params = MessageCreateParams.builder()
+                .model(Model.CLAUDE_HAIKU_4_5)
+                .maxTokens(4096L)
+                .systemOfTextBlockParams(List.of(
+                        TextBlockParam.builder()
+                                .text(systemPrompt)
+                                .cacheControl(CacheControlEphemeral.builder().build())
+                                .build()))
+                .outputConfig(JobPostingResponse.class)
+                .addUserMessage(pageText)
+                .build();
+
+        StructuredMessage<JobPostingResponse> message = client.messages().create(params);
 
         return message.content().stream()
                 .flatMap(block -> block.text().stream())

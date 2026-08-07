@@ -70,11 +70,12 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setBaseResume(baseResume);
         application.setCompanyName(applicationRequestDto.getCompanyName());
         application.setRoleTitle(applicationRequestDto.getRoleTitle());
+        application.setLocation(applicationRequestDto.getLocation());
         application.setJobURL(applicationRequestDto.getJobURL());
         application.setJobDescription(applicationRequestDto.getJobDescription());
         application.setApplicationChannel(applicationRequestDto.getApplicationChannel());
         application.setApplicationStatus(applicationRequestDto.getApplicationStatus());
-        application.setNotes(application.getNotes());
+        application.setNotes(applicationRequestDto.getNotes());
 
         application = applicationRepository.save(application);
 
@@ -167,7 +168,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         return new ApplicationResponseDto(
                 application.getId(), application.getUser().getId(),
                 application.getBaseResume().getId(), application.getCompanyName(),
-                application.getRoleTitle(), application.getJobURL(), application.getJobDescription(),
+                application.getRoleTitle(), application.getLocation(), application.getJobURL(), application.getJobDescription(),
                 application.getApplicationChannel(), application.getApplicationStatus(), application.getNotes(),
                 application.getCreatedAt(), application.getUpdatedAt()
         );

@@ -32,6 +32,9 @@ public class Application {
     @Column(name="role_title")
     private String roleTitle;
 
+    @Column(name="location")
+    private String location;
+
     @Column(name="job_url")
     private String jobURL;
 
@@ -59,11 +62,12 @@ public class Application {
 
     public Application() {}
 
-    public Application(User user, BaseResume baseResume, String companyName, String roleTitle, String jobURL, String jobDescription, ApplicationChannel applicationChannel, ApplicationStatus applicationStatus, String notes) {
+    public Application(User user, BaseResume baseResume, String companyName, String roleTitle, String location, String jobURL, String jobDescription, ApplicationChannel applicationChannel, ApplicationStatus applicationStatus, String notes) {
         this.user = user;
         this.baseResume = baseResume;
         this.companyName = companyName;
         this.roleTitle = roleTitle;
+        this.location = location;
         this.jobURL = jobURL;
         this.jobDescription = jobDescription;
         this.applicationChannel = applicationChannel;
@@ -109,6 +113,14 @@ public class Application {
 
     public void setRoleTitle(String roleTitle) {
         this.roleTitle = roleTitle;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getJobURL() {
@@ -167,6 +179,7 @@ public class Application {
         this.updatedAt = updatedAt;
     }
 
+
     @Override
     public String toString() {
         return "Application{" +
@@ -175,6 +188,7 @@ public class Application {
                 ", baseResume=" + baseResume +
                 ", companyName='" + companyName + '\'' +
                 ", roleTitle='" + roleTitle + '\'' +
+                ", location='" + location + '\'' +
                 ", jobURL='" + jobURL + '\'' +
                 ", jobDescription='" + jobDescription + '\'' +
                 ", applicationChannel=" + applicationChannel +
