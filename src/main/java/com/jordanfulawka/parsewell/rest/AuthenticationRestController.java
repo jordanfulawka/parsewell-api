@@ -1,5 +1,6 @@
 package com.jordanfulawka.parsewell.rest;
 
+import com.jordanfulawka.parsewell.dto.authentication.AuthResponse;
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.repository.UserRepository;
 import com.jordanfulawka.parsewell.security.JwtUtil;
@@ -31,7 +32,7 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/signin")
-    public String authenticateUser(@RequestBody User user) {
+    public AuthResponse authenticateUser(@RequestBody User user) {
         Authentication authentication = authenticationManager.authenticate(
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                         user.getEmail(),
@@ -40,13 +41,13 @@ public class AuthenticationRestController {
         );
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User foundUser = userRepository.findByEmail(user.getEmail());
-        return jwtUtil.generateToken(foundUser.getId(), foundUser.getFirstName(), foundUser.getEmail());
+        return new AuthResponse(jwtUtil.generateToken(foundUser.getId(), foundUser.getFirstName(), foundUser.getEmail()), "Logged in successfully");
     }
 
     @PostMapping("/signup")
-    public String registerUser(@RequestBody User user) {
+    public AuthResponse registerUser(@RequestBody User user) {
         if(userRepository.existsByEmail(user.getEmail())) {
-            return "User already exists";
+            return new AuthResponse(null, "User already exists");
         }
 
         final User newUser = new User(
@@ -54,7 +55,9 @@ public class AuthenticationRestController {
                 user.getEmail(),
                 passwordEncoder.encode(user.getPassword())
         );
-        userRepository.save(newUser);
-        return "User registered successfully!";
+        User savedUser = userRepository.save(newUser);
+
+        String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getFirstName(), savedUser.getEmail());
+        return new AuthResponse(token, "User registered successfully");
     }
 }
