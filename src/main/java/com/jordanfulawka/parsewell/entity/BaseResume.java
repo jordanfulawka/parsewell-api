@@ -19,10 +19,10 @@ public class BaseResume {
     @JoinColumn(name="user_id", unique = true ,nullable = false)
     private User user;
 
-    @Column(name="content")
+    @Column(name="content", columnDefinition = "text")
     private String content;
 
-    @Column(name="original_file_url")
+    @Column(name="original_file_url", columnDefinition = "text")
     private String originalFileURL;
 
     @CreationTimestamp
@@ -52,7 +52,7 @@ public class BaseResume {
     public void setUser(User user) {
         this.user = user;
     }
-    
+
 
     public String getContent() {
         return content;

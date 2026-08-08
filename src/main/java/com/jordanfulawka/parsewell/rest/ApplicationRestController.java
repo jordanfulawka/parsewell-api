@@ -7,6 +7,8 @@ import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterRespo
 import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,11 +30,6 @@ public class ApplicationRestController {
         return applicationService.createApplication(applicationRequestDto);
     }
 
-    @GetMapping("")
-    public List<ApplicationResponseDto> getAllApplications() {
-        return applicationService.getAllApplications();
-    }
-
     @PostMapping("/{id}/generate-edits")
     public List<EditSuggestionResponse> generateEdits(@PathVariable UUID id) {
         return applicationService.generateEditSuggestions(id);
@@ -46,5 +43,10 @@ public class ApplicationRestController {
     @PostMapping("/{id}/upload-final-materials")
     public FinalMaterialDto uploadFinalMaterials(@PathVariable UUID id, @RequestBody FinalMaterialDto finalMaterialDto) {
         return applicationService.saveFinalMaterials(id, finalMaterialDto);
+    }
+
+    @PostMapping("/{id}/materials/upload-url")
+    public String getUploadUrl(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id, @RequestBody String type) {
+        return "";
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class BaseResumeServiceImpl implements BaseResumeService{
@@ -61,10 +60,14 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     }
 
     @Override
-    public BaseResumeResponseDto createBaseResumeFromFile(UUID userId, String label, String s3Key) throws IOException {
+    public BaseResumeResponseDto createBaseResumeFromFile(String email) throws IOException {
+
+        User user = userRepository.findByEmail(email);
+        String s3Key = "resumes/" + user.getId() + "/base-resume.pdf";
+
         byte[] pdfBytes = s3Service.downloadObject(s3Key);
         String content = pdfTextExtractor.extractText(pdfBytes);
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+//        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         BaseResume baseResume = baseResumeRepository.findByUser_Email(user.getEmail());
         if (baseResume == null) {
