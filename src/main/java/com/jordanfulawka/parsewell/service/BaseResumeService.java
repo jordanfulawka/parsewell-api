@@ -11,4 +11,5 @@ public interface BaseResumeService {
     BaseResumeResponseDto createBaseResume(BaseResumeRequestDto baseResumeRequestDto);
     List<BaseResumeResponseDto> getAllBaseResumes();
     BaseResumeResponseDto createBaseResumeFromFile(UUID userId, String label, String s3Key) throws IOException;
+    BaseResumeResponseDto getBaseResumeForUser(String email);
 }

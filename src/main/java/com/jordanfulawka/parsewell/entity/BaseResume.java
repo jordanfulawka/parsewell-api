@@ -15,12 +15,9 @@ public class BaseResume {
     @Column(name="id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id", unique = true ,nullable = false)
     private User user;
-
-    @Column(name="label")
-    private String label;
 
     @Column(name="content")
     private String content;
@@ -34,9 +31,8 @@ public class BaseResume {
 
     public BaseResume() {}
 
-    public BaseResume(User user, String label, String content, String originalFileURL) {
+    public BaseResume(User user, String content, String originalFileURL) {
         this.user = user;
-        this.label = label;
         this.content = content;
         this.originalFileURL = originalFileURL;
     }
@@ -56,14 +52,7 @@ public class BaseResume {
     public void setUser(User user) {
         this.user = user;
     }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
+    
 
     public String getContent() {
         return content;

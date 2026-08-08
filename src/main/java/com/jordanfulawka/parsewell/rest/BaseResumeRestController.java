@@ -3,6 +3,8 @@ package com.jordanfulawka.parsewell.rest;
 import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.service.BaseResumeService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,5 +27,10 @@ public class BaseResumeRestController {
     @GetMapping("")
     public List<BaseResumeResponseDto> getAllBaseResumes() {
         return baseResumeService.getAllBaseResumes();
+    }
+
+    @GetMapping("/me")
+    public BaseResumeResponseDto getMyBaseResume(@AuthenticationPrincipal UserDetails userDetails) {
+        return baseResumeService.getBaseResumeForUser(userDetails.getUsername());
     }
 }

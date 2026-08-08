@@ -42,7 +42,6 @@ public class BaseResumeServiceImpl implements BaseResumeService{
 
         BaseResume baseResume = new BaseResume();
         baseResume.setUser(user);
-        baseResume.setLabel(baseResumeRequestDto.getLabel());
         baseResume.setContent(baseResumeRequestDto.getContent());
         baseResume.setOriginalFileURL(baseResumeRequestDto.getOriginalFileURL());
 
@@ -67,9 +66,12 @@ public class BaseResumeServiceImpl implements BaseResumeService{
         String content = pdfTextExtractor.extractText(pdfBytes);
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        BaseResume baseResume = new BaseResume();
-        baseResume.setUser(user);
-        baseResume.setLabel(label);
+        BaseResume baseResume = baseResumeRepository.findByUser_Email(user.getEmail());
+        if (baseResume == null) {
+            baseResume = new BaseResume();
+            baseResume.setUser(user);
+        }
+
         baseResume.setContent(content);
         baseResume.setOriginalFileURL(s3Key);
 
@@ -77,11 +79,19 @@ public class BaseResumeServiceImpl implements BaseResumeService{
 
     }
 
+    @Override
+    public BaseResumeResponseDto getBaseResumeForUser(String email) {
+        BaseResume baseResume = baseResumeRepository.findByUser_Email(email);
+        if(baseResume == null) {
+            throw new EntityNotFoundException("Base resume not found for user with email: " + email);
+        }
+        return mapToResponse(baseResume);
+    }
+
     private BaseResumeResponseDto mapToResponse(BaseResume baseResume) {
         return new BaseResumeResponseDto(
                 baseResume.getId(), baseResume.getUser().getId(),
-                baseResume.getLabel(), baseResume.getContent(),
-                baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
+                baseResume.getContent(), baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
         );
     }
 }
