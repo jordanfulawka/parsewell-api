@@ -6,12 +6,14 @@ import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseD
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
 import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.entity.*;
 import com.jordanfulawka.parsewell.entity.enums.EditType;
 import com.jordanfulawka.parsewell.repository.*;
 import com.jordanfulawka.parsewell.service.ai.ClaudeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -60,12 +62,18 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
+    public ApplicationResponseDto createOrSaveApplication(ApplicationRequestDto applicationRequestDto) {
 
         User user = userRepository.findById(applicationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         BaseResume baseResume = baseResumeRepository.findById(applicationRequestDto.getBaseResumeId()).orElseThrow(() -> new EntityNotFoundException("Base resume not found"));
 
-        Application application = new Application();
+        Application application;
+        if(applicationRequestDto.getId() == null) {
+            application = new Application();
+        } else {
+            application = applicationRepository.findById(applicationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Application not found"));
+        }
+
         application.setUser(user);
         application.setBaseResume(baseResume);
         application.setCompanyName(applicationRequestDto.getCompanyName());
@@ -81,6 +89,25 @@ public class ApplicationServiceImpl implements ApplicationService{
 
         return mapToResponse(application);
     }
+
+    @Override
+    public ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails) {
+
+        User user = userRepository.findByEmail(userDetails.getUsername());
+        BaseResume baseResume = baseResumeRepository.findByUser_Email(user.getEmail());
+
+        ApplicationRequestDto applicationRequestDto = new ApplicationRequestDto();
+        applicationRequestDto.setUserId(user.getId());
+        applicationRequestDto.setBaseResumeId(baseResume.getId());
+        applicationRequestDto.setCompanyName(jobPostingResponse.getCompanyName());
+        applicationRequestDto.setRoleTitle(jobPostingResponse.getRoleTitle());
+        applicationRequestDto.setLocation(jobPostingResponse.getLocation());
+        applicationRequestDto.setJobURL(jobPostingResponse.getJobUrl());
+        applicationRequestDto.setJobDescription(jobPostingResponse.getJobDescription());
+
+        return applicationRequestDto;
+    }
+
 
     @Override
     public List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId) {
@@ -143,6 +170,12 @@ public class ApplicationServiceImpl implements ApplicationService{
         finalMaterialRepository.save(finalMaterial);
 
         return dto;
+    }
+
+    @Override
+    public ApplicationResponseDto findById(UUID applicationId) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application not found!"));
+        return mapToResponse(application);
     }
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {

@@ -27,7 +27,12 @@ public class ApplicationRestController {
 
     @PostMapping("")
     public ApplicationResponseDto createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
-        return applicationService.createApplication(applicationRequestDto);
+        return applicationService.createOrSaveApplication(applicationRequestDto);
+    }
+
+    @GetMapping("/{id}")
+    public ApplicationResponseDto findApplicationById(@PathVariable UUID id) {
+        return applicationService.findById(id);
     }
 
     @PostMapping("/{id}/generate-edits")

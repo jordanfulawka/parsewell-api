@@ -38,7 +38,7 @@ public class Application {
     @Column(name="job_url")
     private String jobURL;
 
-    @Column(name="job_description")
+    @Column(name="job_description", columnDefinition = "text")
     private String jobDescription;
 
     @Enumerated(EnumType.STRING)

@@ -19,7 +19,7 @@ public class JobPostingResponse {
     @JsonPropertyDescription("The full job description text, cleaned of navigation/apply-button boilerplate.")
     private String jobDescription;
 
-    public JobPostingResponse () {}
+    public JobPostingResponse() {}
 
     public JobPostingResponse(String companyName, String roleTitle, String location, String jobUrl, String jobDescription) {
         this.companyName = companyName;

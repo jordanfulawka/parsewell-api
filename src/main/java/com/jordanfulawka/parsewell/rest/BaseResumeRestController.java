@@ -30,7 +30,6 @@ public class BaseResumeRestController {
 
     @PutMapping("/me")
     public BaseResumeResponseDto uploadMyBaseResume(@AuthenticationPrincipal UserDetails userDetails, @RequestBody BaseResumeRequestDto baseResumeRequestDto) throws IOException {
-        System.out.println(baseResumeRequestDto);
         return baseResumeService.createBaseResumeFromFile(userDetails.getUsername(), baseResumeRequestDto.fileName());
     }
 
