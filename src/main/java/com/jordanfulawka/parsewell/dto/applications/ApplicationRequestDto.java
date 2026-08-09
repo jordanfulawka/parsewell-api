@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public class ApplicationRequestDto {
 
-    private UUID id;
     private UUID userId;
     private UUID baseResumeId;
     private String companyName;
@@ -21,13 +20,6 @@ public class ApplicationRequestDto {
 
     public ApplicationRequestDto() {}
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public UUID getUserId() {
         return userId;

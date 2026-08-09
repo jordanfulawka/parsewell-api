@@ -13,11 +13,12 @@ import java.util.UUID;
 
 public interface ApplicationService {
     List<ApplicationResponseDto> getAllApplications();
-    ApplicationResponseDto createOrSaveApplication(ApplicationRequestDto applicationRequestDto);
+    ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto);
     ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails);
     List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId);
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);
     FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto finalMaterialDto);
     ApplicationResponseDto findById(UUID applicationId);
     List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId);
+    ApplicationResponseDto updateApplication(ApplicationResponseDto applicationResponseDto);
 }

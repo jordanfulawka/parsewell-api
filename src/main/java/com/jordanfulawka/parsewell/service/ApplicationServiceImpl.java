@@ -8,6 +8,7 @@ import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterRespo
 import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.entity.*;
+import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
 import com.jordanfulawka.parsewell.entity.enums.EditType;
 import com.jordanfulawka.parsewell.repository.*;
 import com.jordanfulawka.parsewell.service.ai.ClaudeService;
@@ -62,18 +63,13 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public ApplicationResponseDto createOrSaveApplication(ApplicationRequestDto applicationRequestDto) {
+    public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
 
         User user = userRepository.findById(applicationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         BaseResume baseResume = baseResumeRepository.findById(applicationRequestDto.getBaseResumeId()).orElseThrow(() -> new EntityNotFoundException("Base resume not found"));
 
-        Application application;
-        if(applicationRequestDto.getId() == null) {
-            application = new Application();
-        } else {
-            application = applicationRepository.findById(applicationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Application not found"));
-        }
 
+        Application application = new Application();
         application.setUser(user);
         application.setBaseResume(baseResume);
         application.setCompanyName(applicationRequestDto.getCompanyName());
@@ -82,13 +78,15 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setJobURL(applicationRequestDto.getJobURL());
         application.setJobDescription(applicationRequestDto.getJobDescription());
         application.setApplicationChannel(applicationRequestDto.getApplicationChannel());
-        application.setApplicationStatus(applicationRequestDto.getApplicationStatus());
+        application.setApplicationStatus(ApplicationStatus.APPLIED);
         application.setNotes(applicationRequestDto.getNotes());
 
         application = applicationRepository.save(application);
 
         return mapToResponse(application);
     }
+
+
 
     @Override
     public ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails) {
@@ -188,6 +186,35 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
         return editSuggestionResponses;
     }
+
+    @Override
+    public ApplicationResponseDto updateApplication(ApplicationResponseDto dto) {
+
+        Application application = applicationRepository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("Application cannot be found"));
+        if(!application.getCompanyName().equals(dto.companyName())) {
+            application.setCompanyName(dto.companyName());
+        }
+        if(!application.getRoleTitle().equals(dto.roleTitle())) {
+            application.setRoleTitle(dto.roleTitle());
+        }
+        if(!application.getLocation().equals(dto.location())) {
+            application.setLocation(dto.location());
+        }
+        if(!application.getJobDescription().equals(dto.jobDescription())) {
+            application.setJobDescription(dto.jobDescription());
+        }
+        if(application.getApplicationChannel() != dto.applicationChannel()) {
+            application.setApplicationChannel(dto.applicationChannel());
+        }
+        if(application.getApplicationStatus() != dto.applicationStatus()) {
+            application.setApplicationStatus(dto.applicationStatus());
+        }
+
+        application = applicationRepository.save(application);
+
+        return mapToResponse(application);
+    }
+
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
         EditSuggestion editSuggestion = new EditSuggestion();

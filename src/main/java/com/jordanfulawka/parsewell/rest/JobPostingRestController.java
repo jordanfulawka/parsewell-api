@@ -33,9 +33,12 @@ public class JobPostingRestController {
     @PostMapping("/parse")
     public ApplicationResponseDto parseJobSite(@RequestBody JobPostingParseRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         String pageText = jobPostingFetchService.fetchWebpageHtml(request.url());
+        if (pageText.isBlank()) {
+            throw new IllegalArgumentException("Could not fetch content from the provided job posting URL.");
+        }
         JobPostingResponse jobPostingResponse = claudeService.parseJobPosting(pageText);
         ApplicationRequestDto applicationRequestDto = applicationService.createApplicationRequest(jobPostingResponse, userDetails);
-        return applicationService.createOrSaveApplication(applicationRequestDto);
+        return applicationService.createApplication(applicationRequestDto);
     }
 
 }

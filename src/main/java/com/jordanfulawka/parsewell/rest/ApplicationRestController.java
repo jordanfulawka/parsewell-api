@@ -5,6 +5,7 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
 import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +28,19 @@ public class ApplicationRestController {
 
     @PostMapping("")
     public ApplicationResponseDto createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
-        return applicationService.createOrSaveApplication(applicationRequestDto);
+        return applicationService.createApplication(applicationRequestDto);
+    }
+
+    @PostMapping("/create-request")
+    public ApplicationRequestDto createApplicationRequest(@RequestBody JobPostingResponse jobPostingResponse, @AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.createApplicationRequest(jobPostingResponse, userDetails);
+    }
+
+
+    @PutMapping("/{id}")
+    public ApplicationResponseDto updateApplication(@RequestBody ApplicationResponseDto applicationResponseDto, @PathVariable UUID id) {
+        System.out.println(applicationResponseDto);
+        return applicationService.updateApplication(applicationResponseDto);
     }
 
     @GetMapping("/{id}")
