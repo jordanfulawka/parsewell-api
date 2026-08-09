@@ -1,14 +1,12 @@
 package com.jordanfulawka.parsewell.rest;
 
+import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.service.BaseResumeService;
 import com.jordanfulawka.parsewell.service.s3.S3Service;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -31,8 +29,9 @@ public class BaseResumeRestController {
     }
 
     @PutMapping("/me")
-    public BaseResumeResponseDto uploadMyBaseResume(@AuthenticationPrincipal UserDetails userDetails) throws IOException {
-        return baseResumeService.createBaseResumeFromFile(userDetails.getUsername());
+    public BaseResumeResponseDto uploadMyBaseResume(@AuthenticationPrincipal UserDetails userDetails, @RequestBody BaseResumeRequestDto baseResumeRequestDto) throws IOException {
+        System.out.println(baseResumeRequestDto);
+        return baseResumeService.createBaseResumeFromFile(userDetails.getUsername(), baseResumeRequestDto.fileName());
     }
 
     @GetMapping("/base/upload-url")

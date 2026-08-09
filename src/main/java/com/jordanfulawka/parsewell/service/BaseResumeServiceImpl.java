@@ -1,6 +1,5 @@
 package com.jordanfulawka.parsewell.service;
 
-import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.entity.BaseResume;
 import com.jordanfulawka.parsewell.entity.User;
@@ -13,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class BaseResumeServiceImpl implements BaseResumeService{
@@ -36,31 +33,7 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     }
 
     @Override
-    public BaseResumeResponseDto createBaseResume(BaseResumeRequestDto baseResumeRequestDto) {
-        User user = userRepository.findById(baseResumeRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(("User not found")));
-
-        BaseResume baseResume = new BaseResume();
-        baseResume.setUser(user);
-        baseResume.setContent(baseResumeRequestDto.getContent());
-        baseResume.setOriginalFileURL(baseResumeRequestDto.getOriginalFileURL());
-
-        baseResume = baseResumeRepository.save(baseResume);
-        return mapToResponse(baseResume);
-    }
-
-    @Override
-    public List<BaseResumeResponseDto> getAllBaseResumes() {
-        List<BaseResume> baseResumes = baseResumeRepository.findAll();
-        List<BaseResumeResponseDto> responses = new ArrayList<>();
-
-        for(BaseResume baseResume : baseResumes) {
-            responses.add(mapToResponse(baseResume));
-        }
-        return responses;
-    }
-
-    @Override
-    public BaseResumeResponseDto createBaseResumeFromFile(String email) throws IOException {
+    public BaseResumeResponseDto createBaseResumeFromFile(String email, String fileName) throws IOException {
 
         User user = userRepository.findByEmail(email);
         String s3Key = "resumes/" + user.getId() + "/base-resume.pdf";
@@ -76,6 +49,7 @@ public class BaseResumeServiceImpl implements BaseResumeService{
         }
 
         baseResume.setContent(content);
+        baseResume.setFileName(fileName);
         baseResume.setOriginalFileURL(s3Key);
 
         return mapToResponse(baseResumeRepository.save(baseResume));
@@ -94,7 +68,8 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     private BaseResumeResponseDto mapToResponse(BaseResume baseResume) {
         return new BaseResumeResponseDto(
                 baseResume.getId(), baseResume.getUser().getId(),
-                baseResume.getContent(), baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
+                baseResume.getContent(), baseResume.getFileName(),
+                baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
         );
     }
 }

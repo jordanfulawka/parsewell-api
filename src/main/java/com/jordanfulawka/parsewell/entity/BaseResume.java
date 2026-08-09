@@ -22,6 +22,9 @@ public class BaseResume {
     @Column(name="content", columnDefinition = "text")
     private String content;
 
+    @Column(name="file_name", columnDefinition = "text")
+    private String fileName;
+
     @Column(name="original_file_url", columnDefinition = "text")
     private String originalFileURL;
 
@@ -31,9 +34,10 @@ public class BaseResume {
 
     public BaseResume() {}
 
-    public BaseResume(User user, String content, String originalFileURL) {
+    public BaseResume(User user, String content, String fileName, String originalFileURL) {
         this.user = user;
         this.content = content;
+        this.fileName = fileName;
         this.originalFileURL = originalFileURL;
     }
 
@@ -60,6 +64,14 @@ public class BaseResume {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getOriginalFileURL() {
