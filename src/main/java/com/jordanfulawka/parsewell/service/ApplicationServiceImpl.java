@@ -178,6 +178,17 @@ public class ApplicationServiceImpl implements ApplicationService{
         return mapToResponse(application);
     }
 
+    @Override
+    public List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId) {
+        List<EditSuggestion> editSuggestions = editSuggestionRepository.findAllByApplicationId(applicationId);
+
+        List<EditSuggestionResponse> editSuggestionResponses = new ArrayList<>();
+        for(EditSuggestion editSuggestion : editSuggestions) {
+            editSuggestionResponses.add(mapToResponse(editSuggestion));
+        }
+        return editSuggestionResponses;
+    }
+
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
         EditSuggestion editSuggestion = new EditSuggestion();
         editSuggestion.setApplication(application);

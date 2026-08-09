@@ -35,9 +35,14 @@ public class ApplicationRestController {
         return applicationService.findById(id);
     }
 
-    @PostMapping("/{id}/generate-edits")
+    @GetMapping("/{id}/generate-edits")
     public List<EditSuggestionResponse> generateEdits(@PathVariable UUID id) {
         return applicationService.generateEditSuggestions(id);
+    }
+
+    @GetMapping("/{id}/edits")
+    public List<EditSuggestionResponse> getEditSuggestions(@PathVariable UUID id) {
+        return applicationService.getEditSuggestionByApplicationId(id);
     }
 
     @PostMapping("/{id}/generate-cover-letter")

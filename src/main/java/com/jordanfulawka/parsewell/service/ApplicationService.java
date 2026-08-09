@@ -19,4 +19,5 @@ public interface ApplicationService {
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);
     FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto finalMaterialDto);
     ApplicationResponseDto findById(UUID applicationId);
+    List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId);
 }
