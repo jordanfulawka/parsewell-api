@@ -4,7 +4,7 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
-import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.*;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +78,23 @@ public class ApplicationRestController {
         return applicationService.saveFinalMaterials(id, finalMaterialDto);
     }
 
-    @PostMapping("/{id}/materials/upload-url")
-    public String getUploadUrl(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id, @RequestBody String type) {
-        return "";
+    @PostMapping("/{id}/upload-resume")
+    public FinalMaterialDto uploadResume(@PathVariable UUID id, @RequestBody ResumeRequestDto resumeRequestDto, @AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.saveResume(id, resumeRequestDto, userDetails.getUsername());
+    }
+
+    @PostMapping("/{id}/upload-cover-letter")
+    public FinalMaterialDto uploadCoverLetter(@PathVariable UUID id, @RequestBody CoverLetterRequestDto coverLetterRequestDto, @AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.saveCoverLetter(id, coverLetterRequestDto, userDetails.getUsername());
+    }
+
+    @GetMapping("/{id}/materials")
+    public FinalMaterialDto getFinalMaterials(@PathVariable UUID id) {
+        return applicationService.getFinalMaterials(id);
+    }
+
+    @GetMapping("/{id}/materials/upload-url")
+    public String getUploadUrl(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id, @RequestParam String type) {
+        return applicationService.createUploadUrl(userDetails.getUsername(), id, type);
     }
 }

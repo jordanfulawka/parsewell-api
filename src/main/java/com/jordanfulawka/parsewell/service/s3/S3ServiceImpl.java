@@ -68,7 +68,7 @@ public class S3ServiceImpl implements S3Service {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
-                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + "/" + uuid + ".pdf")
+                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + ".pdf")
                     .build();
 
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()

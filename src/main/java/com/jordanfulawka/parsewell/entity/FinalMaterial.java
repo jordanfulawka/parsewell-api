@@ -1,7 +1,7 @@
 package com.jordanfulawka.parsewell.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,22 +19,29 @@ public class FinalMaterial {
     @JoinColumn(name="application_id")
     private Application application;
 
-    @Column(name="resume_url")
-    private String resumeURL;
+    @Column(name="resume_key")
+    private String resumeKey;
 
-    @Column(name="cover_letter_url")
-    private String coverLetterURL;
+    @Column(name="resume_filename")
+    private String resumeFilename;
 
-    @CreationTimestamp
-    @Column(name="uploaded_at")
+    @Column(name="cover_letter_key")
+    private String coverLetterKey;
+
+    @Column(name="cover_letter_filename")
+    private String coverLetterFilename;
+
+    @UpdateTimestamp
+    @Column(name="last_updated")
     private LocalDateTime uploadedAt;
 
     public FinalMaterial() {}
 
-    public FinalMaterial(Application application, String resumeURL, String coverLetterURL) {
-        this.application = application;
-        this.resumeURL = resumeURL;
-        this.coverLetterURL = coverLetterURL;
+    public FinalMaterial(String resumeKey, String resumeFilename, String coverLetterKey, String coverLetterFilename) {
+        this.resumeKey = resumeKey;
+        this.resumeFilename = resumeFilename;
+        this.coverLetterKey = coverLetterKey;
+        this.coverLetterFilename = coverLetterFilename;
     }
 
     public UUID getId() {
@@ -53,20 +60,36 @@ public class FinalMaterial {
         this.application = application;
     }
 
-    public String getResumeURL() {
-        return resumeURL;
+    public String getResumeKey() {
+        return resumeKey;
     }
 
-    public void setResumeURL(String resumeURL) {
-        this.resumeURL = resumeURL;
+    public void setResumeKey(String resumeKey) {
+        this.resumeKey = resumeKey;
     }
 
-    public String getCoverLetterURL() {
-        return coverLetterURL;
+    public String getResumeFilename() {
+        return resumeFilename;
     }
 
-    public void setCoverLetterURL(String coverLetterURL) {
-        this.coverLetterURL = coverLetterURL;
+    public void setResumeFilename(String resumeFilename) {
+        this.resumeFilename = resumeFilename;
+    }
+
+    public String getCoverLetterKey() {
+        return coverLetterKey;
+    }
+
+    public void setCoverLetterKey(String coverLetterKey) {
+        this.coverLetterKey = coverLetterKey;
+    }
+
+    public String getCoverLetterFilename() {
+        return coverLetterFilename;
+    }
+
+    public void setCoverLetterFilename(String coverLetterFilename) {
+        this.coverLetterFilename = coverLetterFilename;
     }
 
     public LocalDateTime getUploadedAt() {
@@ -82,8 +105,10 @@ public class FinalMaterial {
         return "FinalMaterial{" +
                 "id=" + id +
                 ", application=" + application +
-                ", resumeURL='" + resumeURL + '\'' +
-                ", coverLetterURL='" + coverLetterURL + '\'' +
+                ", resumeKey='" + resumeKey + '\'' +
+                ", resumeFilename='" + resumeFilename + '\'' +
+                ", coverLetterKey='" + coverLetterKey + '\'' +
+                ", coverLetterFilename='" + coverLetterFilename + '\'' +
                 ", uploadedAt=" + uploadedAt +
                 '}';
     }

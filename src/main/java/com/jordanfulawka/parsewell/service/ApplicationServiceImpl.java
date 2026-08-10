@@ -5,13 +5,14 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
-import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.*;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.entity.*;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
 import com.jordanfulawka.parsewell.entity.enums.EditType;
 import com.jordanfulawka.parsewell.repository.*;
 import com.jordanfulawka.parsewell.service.ai.ClaudeService;
+import com.jordanfulawka.parsewell.service.s3.S3Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,6 +32,7 @@ public class ApplicationServiceImpl implements ApplicationService{
     private final EditSuggestionRepository editSuggestionRepository;
     private final GeneratedCoverLetterRepository generatedCoverLetterRepository;
     private final FinalMaterialRepository finalMaterialRepository;
+    private final S3Service s3Service;
 
     @Autowired
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
@@ -39,7 +41,8 @@ public class ApplicationServiceImpl implements ApplicationService{
                                   ClaudeService claudeService,
                                   EditSuggestionRepository editSuggestionRepository,
                                   GeneratedCoverLetterRepository generatedCoverLetterRepository,
-                                  FinalMaterialRepository finalMaterialRepository) {
+                                  FinalMaterialRepository finalMaterialRepository,
+                                  S3Service s3Service) {
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
         this.baseResumeRepository = baseResumeRepository;
@@ -47,20 +50,9 @@ public class ApplicationServiceImpl implements ApplicationService{
         this.editSuggestionRepository = editSuggestionRepository;
         this.generatedCoverLetterRepository = generatedCoverLetterRepository;
         this.finalMaterialRepository = finalMaterialRepository;
+        this.s3Service = s3Service;
     }
 
-    @Override
-    public List<ApplicationResponseDto> getAllApplications() {
-
-        List<Application> applications = applicationRepository.findAll();
-        List<ApplicationResponseDto> responses = new ArrayList<>();
-
-        for(Application application : applications) {
-            responses.add(mapToResponse(application));
-        }
-
-        return responses;
-    }
 
     @Override
     public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
@@ -188,13 +180,63 @@ public class ApplicationServiceImpl implements ApplicationService{
     public FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto dto) {
         Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application not found"));
 
-        FinalMaterial finalMaterial = new FinalMaterial();
+
+        FinalMaterial finalMaterial = finalMaterialRepository.findByApplicationId(applicationId);
+        if(finalMaterial == null) {
+            finalMaterial = new FinalMaterial();
+        }
+
         finalMaterial.setApplication(application);
-        finalMaterial.setResumeURL(dto.resumeURL());
-        finalMaterial.setCoverLetterURL(dto.coverLetterURL());
+        finalMaterial.setResumeKey(dto.resumeKey());
+        finalMaterial.setResumeFilename(dto.resumeFilename());
+        finalMaterial.setCoverLetterKey(dto.coverLetterKey());
+        finalMaterial.setCoverLetterFilename(dto.coverLetterFilename());
         finalMaterialRepository.save(finalMaterial);
 
         return dto;
+    }
+
+    public FinalMaterialDto saveResume(UUID applicationId, ResumeRequestDto dto, String email) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application nto found"));
+        User user = userRepository.findByEmail(email);
+
+        FinalMaterial finalMaterial = finalMaterialRepository.findByApplicationId(applicationId);
+        if(finalMaterial == null) {
+            finalMaterial = new FinalMaterial();
+            finalMaterial.setApplication(application);
+        }
+
+        finalMaterial.setResumeFilename(dto.fileName());
+        finalMaterial.setResumeKey("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/resume.pdf");
+        finalMaterialRepository.save(finalMaterial);
+
+        return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
+
+    }
+
+    public FinalMaterialDto saveCoverLetter(UUID applicationId, CoverLetterRequestDto dto, String email) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application nto found"));
+        User user = userRepository.findByEmail(email);
+
+
+        FinalMaterial finalMaterial = finalMaterialRepository.findByApplicationId(applicationId);
+        if(finalMaterial == null) {
+            finalMaterial = new FinalMaterial();
+            finalMaterial.setApplication(application);
+        }
+
+        finalMaterial.setCoverLetterFilename(dto.fileName());
+        finalMaterial.setCoverLetterKey("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/coverLetter.pdf");
+        finalMaterialRepository.save(finalMaterial);
+
+        return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
+
+    }
+
+    public FinalMaterialDto getFinalMaterials(UUID applicationId) {
+        FinalMaterial finalMaterial = finalMaterialRepository.findByApplicationId(applicationId);
+
+        return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
     }
 
     @Override
@@ -243,6 +285,11 @@ public class ApplicationServiceImpl implements ApplicationService{
         return mapToResponse(application);
     }
 
+    @Override
+    public String createUploadUrl(String email, UUID applicationId, String type) {
+        return s3Service.createPresignedPutUrl(email, applicationId, type);
+    }
+
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
         EditSuggestion editSuggestion = new EditSuggestion();
@@ -277,6 +324,5 @@ public class ApplicationServiceImpl implements ApplicationService{
         generatedCoverLetter.setApplication(application);
         generatedCoverLetter.setContent(generatedCoverLetterResponse.content());
     }
-
 
 }
