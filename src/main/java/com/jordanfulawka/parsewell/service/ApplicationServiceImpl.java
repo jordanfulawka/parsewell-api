@@ -173,6 +173,11 @@ public class ApplicationServiceImpl implements ApplicationService{
     @Override
     public GeneratedCoverLetterResponse getCoverLetterByApplicationId(UUID applicationId) {
         GeneratedCoverLetter generatedCoverLetter = generatedCoverLetterRepository.findByApplicationId(applicationId);
+
+        if(generatedCoverLetter == null) {
+            throw new EntityNotFoundException("Cover letter not found for application " + applicationId);
+        }
+
         return new GeneratedCoverLetterResponse(generatedCoverLetter.getContent());
     }
 
@@ -236,6 +241,10 @@ public class ApplicationServiceImpl implements ApplicationService{
     public FinalMaterialDto getFinalMaterials(UUID applicationId) {
         FinalMaterial finalMaterial = finalMaterialRepository.findByApplicationId(applicationId);
 
+        if(finalMaterial == null) {
+            throw new EntityNotFoundException("Final materials not found for application " + applicationId);
+        }
+
         return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
     }
 
@@ -249,6 +258,9 @@ public class ApplicationServiceImpl implements ApplicationService{
     public List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId) {
         List<EditSuggestion> editSuggestions = editSuggestionRepository.findAllByApplicationIdOrderByOrderIndex(applicationId);
 
+        if(editSuggestions == null) {
+            throw new EntityNotFoundException("Edit suggestions not found for application " + applicationId);
+        }
 
         List<EditSuggestionResponse> editSuggestionResponses = new ArrayList<>();
         for(EditSuggestion editSuggestion : editSuggestions) {
