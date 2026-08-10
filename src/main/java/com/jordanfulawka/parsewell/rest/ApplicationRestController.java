@@ -26,6 +26,11 @@ public class ApplicationRestController {
         this.applicationService = applicationService;
     }
 
+    @GetMapping("")
+    public List<ApplicationResponseDto> getApplications(@AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.getAllApplications(userDetails.getUsername());
+    }
+
     @PostMapping("")
     public ApplicationResponseDto createApplication(@RequestBody ApplicationRequestDto applicationRequestDto) {
         return applicationService.createApplication(applicationRequestDto);
@@ -58,9 +63,14 @@ public class ApplicationRestController {
         return applicationService.getEditSuggestionByApplicationId(id);
     }
 
-    @PostMapping("/{id}/generate-cover-letter")
+    @GetMapping("/{id}/generate-cover-letter")
     public GeneratedCoverLetterResponse generateCoverLetter(@PathVariable UUID id) {
         return applicationService.generateCoverLetter(id);
+    }
+
+    @GetMapping("/{id}/cover-letter")
+    public GeneratedCoverLetterResponse getCoverLetter(@PathVariable UUID id) {
+        return applicationService.getCoverLetterByApplicationId(id);
     }
 
     @PostMapping("/{id}/upload-final-materials")

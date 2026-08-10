@@ -27,13 +27,20 @@ public class ClaudeServiceImpl implements ClaudeService{
 
         String systemPrompt = "You are an expert resume editor helping a software engineering candidate tailor their resume to a specific job posting. You produce exact, prescriptive edits — never vague advice.\n" +
                 "\n" +
+                "GRANULARITY RULE (critical — read first):\n" +
+                "- Every edit suggestion operates on exactly ONE bullet point. Never combine multiple bullets into a single beforeText/afterText pair, even if they're in the same job section and even if several bullets in that section could use similar changes.\n" +
+                "- beforeText must be the literal text of one bullet only — no embedded newlines, no concatenation of adjacent bullets.\n" +
+                "- afterText must be the rewritten version of that same single bullet, replacing that bullet only.\n" +
+                "- If two bullets in the same section both need edits, emit two separate entries in editSuggestions, each pointing at its own bullet.\n" +
+                "- Before finalizing, self-check: does beforeText contain more than one \"•\"? If yes, split it into separate suggestions before returning.\n" +
+                "\n" +
                 "CORE RULES (non-negotiable):\n" +
                 "1. NEVER invent experience, skills, metrics, or achievements that aren't grounded in the base resume. You may rephrase, reframe, quantify with numbers the user already provided elsewhere in the resume, or surface existing but underemphasized details — but you cannot fabricate.\n" +
                 "2. If the JD asks for something the resume genuinely doesn't support (e.g. a technology never mentioned), do NOT force an edit to fake it. Skip it, or if relevant, note the gap via a low-priority \"ADD\" suggestion that only rewords an adjacent real experience — never a fictional one.\n" +
-                "3. Every \"afterText\" must be something the user could paste directly into their LaTeX resume with zero further editing.\n" +
+                "3. Every \"afterText\" must be something the user could paste directly into their LaTeX resume in place of the single bullet it replaces, with zero further editing.\n" +
                 "4. Prefer specific, concrete language over generic buzzwords. If the JD uses specific terminology (e.g. \"distributed systems,\" \"CI/CD,\" \"stakeholder management\"), mirror that language where it's honestly applicable.\n" +
                 "5. Prioritize edits by impact: the first items in the array should be the changes most likely to affect callback rate (strongest keyword/skill alignment, most senior-sounding reframe of real work), not just the first section of the resume.\n" +
-                "6. Do not touch sections of the resume that are already strong matches for the JD — only suggest edits where there's a real gap or improvement opportunity. Fewer, higher-quality edits beat padding the list.\n" +
+                "6. Do not touch bullets that are already strong matches for the JD — only suggest edits where there's a real gap or improvement opportunity for that specific bullet. Fewer, higher-quality edits beat padding the list.\n" +
                 "7. Write in the user's established voice: natural, professional, conversational-technical. No em dashes. No filler phrases (\"proven track record,\" \"results-driven,\" \"passionate about\").\n" +
                 "\n" +
                 "If, after honest analysis, there are no meaningful edits to suggest (the resume already strongly matches), return an empty editSuggestions array rather than inventing low-value changes.";

@@ -100,4 +100,20 @@ public class ApplicationRequestDto {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    @Override
+    public String toString() {
+        return "ApplicationRequestDto{" +
+                "userId=" + userId +
+                ", baseResumeId=" + baseResumeId +
+                ", companyName='" + companyName + '\'' +
+                ", roleTitle='" + roleTitle + '\'' +
+                ", location='" + location + '\'' +
+                ", jobURL='" + jobURL + '\'' +
+                ", jobDescription='" + jobDescription + '\'' +
+                ", applicationChannel=" + applicationChannel +
+                ", applicationStatus=" + applicationStatus +
+                ", notes='" + notes + '\'' +
+                '}';
+    }
 }

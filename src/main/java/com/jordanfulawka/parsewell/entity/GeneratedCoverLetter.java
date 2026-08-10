@@ -1,7 +1,7 @@
 package com.jordanfulawka.parsewell.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,7 +22,7 @@ public class GeneratedCoverLetter {
     @Column(name="content", columnDefinition = "TEXT")
     private String content;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(name="generated_at")
     private LocalDateTime generatedAt;
 

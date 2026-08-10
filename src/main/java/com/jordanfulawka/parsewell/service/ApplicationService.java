@@ -15,8 +15,10 @@ public interface ApplicationService {
     List<ApplicationResponseDto> getAllApplications();
     ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto);
     ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails);
+    List<ApplicationResponseDto> getAllApplications(String email);
     List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId);
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);
+    GeneratedCoverLetterResponse getCoverLetterByApplicationId(UUID applicationId);
     FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto finalMaterialDto);
     ApplicationResponseDto findById(UUID applicationId);
     List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId);

@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface EditSuggestionRepository extends JpaRepository<EditSuggestion, UUID> {
     List<EditSuggestion> findAllByApplicationId(UUID id);
+    List<EditSuggestion> findAllByApplicationIdOrderByOrderIndex(UUID id);
+
 }

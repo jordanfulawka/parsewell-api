@@ -65,6 +65,8 @@ public class ApplicationServiceImpl implements ApplicationService{
     @Override
     public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
 
+        System.out.println(applicationRequestDto);
+
         User user = userRepository.findById(applicationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         BaseResume baseResume = baseResumeRepository.findById(applicationRequestDto.getBaseResumeId()).orElseThrow(() -> new EntityNotFoundException("Base resume not found"));
 
@@ -104,6 +106,20 @@ public class ApplicationServiceImpl implements ApplicationService{
         applicationRequestDto.setJobDescription(jobPostingResponse.getJobDescription());
 
         return applicationRequestDto;
+    }
+
+    @Override
+    public List<ApplicationResponseDto> getAllApplications(String email) {
+        User user = userRepository.findByEmail(email);
+        List<Application> applications = applicationRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId());
+
+        List<ApplicationResponseDto> applicationResponses = new ArrayList<>();
+
+        for(Application application : applications) {
+            applicationResponses.add(mapToResponse(application));
+        }
+
+        return applicationResponses;
     }
 
 
@@ -151,10 +167,21 @@ public class ApplicationServiceImpl implements ApplicationService{
                 suggestions
         );
 
-        GeneratedCoverLetter generatedCoverLetter = mapToEntity(generatedCoverLetterResponse, application);
+        GeneratedCoverLetter generatedCoverLetter = generatedCoverLetterRepository.findByApplicationId(applicationId);
+        if(generatedCoverLetter == null) {
+            generatedCoverLetter = new GeneratedCoverLetter();
+        }
+
+        mapToEntity(generatedCoverLetter, generatedCoverLetterResponse, application);
         generatedCoverLetterRepository.save(generatedCoverLetter);
 
         return generatedCoverLetterResponse;
+    }
+
+    @Override
+    public GeneratedCoverLetterResponse getCoverLetterByApplicationId(UUID applicationId) {
+        GeneratedCoverLetter generatedCoverLetter = generatedCoverLetterRepository.findByApplicationId(applicationId);
+        return new GeneratedCoverLetterResponse(generatedCoverLetter.getContent());
     }
 
     @Override
@@ -178,7 +205,8 @@ public class ApplicationServiceImpl implements ApplicationService{
 
     @Override
     public List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId) {
-        List<EditSuggestion> editSuggestions = editSuggestionRepository.findAllByApplicationId(applicationId);
+        List<EditSuggestion> editSuggestions = editSuggestionRepository.findAllByApplicationIdOrderByOrderIndex(applicationId);
+
 
         List<EditSuggestionResponse> editSuggestionResponses = new ArrayList<>();
         for(EditSuggestion editSuggestion : editSuggestions) {
@@ -245,11 +273,10 @@ public class ApplicationServiceImpl implements ApplicationService{
         );
     }
 
-    private GeneratedCoverLetter mapToEntity(GeneratedCoverLetterResponse generatedCoverLetterResponse, Application application) {
-        GeneratedCoverLetter generatedCoverLetter = new GeneratedCoverLetter();
+    private void mapToEntity(GeneratedCoverLetter generatedCoverLetter, GeneratedCoverLetterResponse generatedCoverLetterResponse, Application application) {
         generatedCoverLetter.setApplication(application);
         generatedCoverLetter.setContent(generatedCoverLetterResponse.content());
-        return generatedCoverLetter;
     }
+
 
 }
