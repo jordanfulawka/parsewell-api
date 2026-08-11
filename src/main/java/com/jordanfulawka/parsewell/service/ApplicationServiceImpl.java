@@ -302,6 +302,11 @@ public class ApplicationServiceImpl implements ApplicationService{
         return s3Service.createPresignedPutUrl(email, applicationId, type);
     }
 
+    @Override
+    public String createDownloadUrl(String email, UUID applicationId, String type) {
+        return s3Service.createPresignedGetUrl(email, applicationId, type);
+    }
+
 
     private EditSuggestion mapToEntity(EditSuggestionAiResponseDto dto, Application application) {
         EditSuggestion editSuggestion = new EditSuggestion();

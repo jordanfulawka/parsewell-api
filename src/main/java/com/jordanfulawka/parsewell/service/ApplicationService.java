@@ -25,6 +25,7 @@ public interface ApplicationService {
     List<EditSuggestionResponse> getEditSuggestionByApplicationId(UUID applicationId);
     ApplicationResponseDto updateApplication(ApplicationResponseDto applicationResponseDto);
     String createUploadUrl(String email, UUID applicationId, String type);
+    String createDownloadUrl(String email, UUID applicationId, String type);
     FinalMaterialDto saveResume(UUID applicationId, ResumeRequestDto dto, String email);
     FinalMaterialDto saveCoverLetter(UUID applicationId, CoverLetterRequestDto dto, String email);
     FinalMaterialDto getFinalMaterials(UUID applicationId);

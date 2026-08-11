@@ -4,7 +4,9 @@ import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
-import com.jordanfulawka.parsewell.dto.finalmaterials.*;
+import com.jordanfulawka.parsewell.dto.finalmaterials.CoverLetterRequestDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.ResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,5 +98,10 @@ public class ApplicationRestController {
     @GetMapping("/{id}/materials/upload-url")
     public String getUploadUrl(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id, @RequestParam String type) {
         return applicationService.createUploadUrl(userDetails.getUsername(), id, type);
+    }
+
+    @GetMapping("/{id}/materials/download-url")
+    public String getDownloadUrl(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id, @RequestParam String type) {
+        return applicationService.createDownloadUrl(userDetails.getUsername(), id, type);
     }
 }

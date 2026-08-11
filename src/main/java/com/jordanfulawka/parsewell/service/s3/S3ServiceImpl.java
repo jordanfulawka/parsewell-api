@@ -88,9 +88,31 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
+    public String createPresignedGetUrl(String email, UUID applicationId, String type) {
+        User user = userRepository.findByEmail(email);
+
+        try {
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket("parsewell-material-uploads")
+                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + ".pdf")
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .getObjectRequest(objectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+            return presignedRequest.url().toExternalForm();
+        } catch (Exception e) {
+            log.error("e: ", e);
+            return "error";
+        }
+    }
+
+    @Override
     public String createPresignedPutUrl(String email, UUID applicationId, String type) {
         User user = userRepository.findByEmail(email);
-        UUID uuid = UUID.randomUUID();
         try {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
