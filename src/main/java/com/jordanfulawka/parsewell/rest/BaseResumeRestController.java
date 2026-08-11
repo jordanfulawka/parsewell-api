@@ -37,4 +37,9 @@ public class BaseResumeRestController {
     public String getUploadUrl(@AuthenticationPrincipal UserDetails userDetails) {
         return s3Service.createPresignedPutUrl(userDetails.getUsername());
     }
+
+    @GetMapping("/base/download-url")
+    public String getDownloadUrl(@AuthenticationPrincipal UserDetails userDetails) {
+        return s3Service.createPresignedGetUrl(userDetails.getUsername());
+    }
 }

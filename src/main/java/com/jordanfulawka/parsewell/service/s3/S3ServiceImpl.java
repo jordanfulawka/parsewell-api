@@ -39,7 +39,6 @@ public class S3ServiceImpl implements S3Service {
     @Override
     public String createPresignedPutUrl(String email) {
         User user = userRepository.findByEmail(email);
-        UUID uuid = UUID.randomUUID();
         try {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -54,6 +53,34 @@ public class S3ServiceImpl implements S3Service {
 
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
             return presignedRequest.url().toExternalForm();
+        } catch (Exception e) {
+            log.error("e: ", e);
+            return "error";
+        }
+    }
+
+    @Override
+    public String createPresignedGetUrl(String email) {
+
+        User user = userRepository.findByEmail(email);
+
+        try {
+
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket("parsewell-material-uploads")
+                    .key("resumes/" + user.getId() + "/base-resume.pdf")
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .getObjectRequest(objectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+
+            return presignedRequest.url().toExternalForm();
+
+
         } catch (Exception e) {
             log.error("e: ", e);
             return "error";
@@ -83,33 +110,6 @@ public class S3ServiceImpl implements S3Service {
             return "error";
         }
     }
-
-    @Override
-    public String createPresignedGetUrl(String key) {
-
-        try {
-
-            GetObjectRequest objectRequest = GetObjectRequest.builder()
-                    .bucket("parsewell-material-uploads")
-                    .key(key)
-                    .build();
-
-            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10))
-                    .getObjectRequest(objectRequest)
-                    .build();
-
-            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-
-            return presignedRequest.url().toExternalForm();
-
-
-        } catch (Exception e) {
-            log.error("e: ", e);
-            return "error";
-        }
-    }
-
 
     @Override
     public byte[] downloadObject(String key) {
