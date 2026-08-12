@@ -2,6 +2,8 @@ package com.jordanfulawka.parsewell.rest;
 
 import com.jordanfulawka.parsewell.dto.authentication.AuthResponse;
 import com.jordanfulawka.parsewell.entity.User;
+import com.jordanfulawka.parsewell.exception.InvalidCredentialsException;
+import com.jordanfulawka.parsewell.exception.UserAlreadyExistsException;
 import com.jordanfulawka.parsewell.repository.UserRepository;
 import com.jordanfulawka.parsewell.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,21 +35,27 @@ public class AuthenticationRestController {
 
     @PostMapping("/signin")
     public AuthResponse authenticateUser(@RequestBody User user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        user.getPassword()
-                )
-        );
-        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User foundUser = userRepository.findByEmail(user.getEmail());
-        return new AuthResponse(jwtUtil.generateToken(foundUser.getId(), foundUser.getFirstName(), foundUser.getEmail()), "Logged in successfully");
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            user.getPassword()
+                    )
+            );
+            final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User foundUser = userRepository.findByEmail(user.getEmail());
+            return new AuthResponse(jwtUtil.generateToken(foundUser.getId(), foundUser.getFirstName(), foundUser.getEmail()), "Logged in successfully");
+        } catch (Exception e) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
     }
 
     @PostMapping("/signup")
     public AuthResponse registerUser(@RequestBody User user) {
         if(userRepository.existsByEmail(user.getEmail())) {
-            return new AuthResponse(null, "User already exists");
+//            return new AuthResponse(null, "User already exists");
+            throw new UserAlreadyExistsException("A user with this email already exists");
         }
 
         final User newUser = new User(
