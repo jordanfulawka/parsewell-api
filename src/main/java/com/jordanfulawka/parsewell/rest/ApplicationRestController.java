@@ -46,7 +46,6 @@ public class ApplicationRestController {
 
     @PutMapping("/{id}")
     public ApplicationResponseDto updateApplication(@RequestBody ApplicationResponseDto applicationResponseDto, @PathVariable UUID id) {
-        System.out.println(applicationResponseDto);
         return applicationService.updateApplication(applicationResponseDto);
     }
 

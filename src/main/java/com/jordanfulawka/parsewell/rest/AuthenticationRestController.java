@@ -1,6 +1,8 @@
 package com.jordanfulawka.parsewell.rest;
 
 import com.jordanfulawka.parsewell.dto.authentication.AuthResponse;
+import com.jordanfulawka.parsewell.dto.authentication.CheckJwtValidationRequest;
+import com.jordanfulawka.parsewell.dto.authentication.CheckJwtValidationResponse;
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.exception.InvalidCredentialsException;
 import com.jordanfulawka.parsewell.exception.UserAlreadyExistsException;
@@ -67,5 +69,15 @@ public class AuthenticationRestController {
 
         String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getFirstName(), savedUser.getEmail());
         return new AuthResponse(token, "User registered successfully");
+    }
+
+    @PostMapping("/validate")
+    public CheckJwtValidationResponse checkValidJwt(@RequestBody CheckJwtValidationRequest jwt) {
+        boolean isValid = jwtUtil.validateJwtToken(jwt.token());
+        if(isValid) {
+            return new CheckJwtValidationResponse(true);
+        } else {
+            return new CheckJwtValidationResponse(false);
+        }
     }
 }
