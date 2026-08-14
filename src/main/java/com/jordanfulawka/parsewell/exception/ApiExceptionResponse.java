@@ -42,7 +42,7 @@ public class ApiExceptionResponse {
     public String toString() {
         return "ApiExceptionResponse{" +
                 "status=" + status +
-                ", message='" + error + '\'' +
+                ", error='" + error + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }
