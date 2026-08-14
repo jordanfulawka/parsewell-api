@@ -4,6 +4,7 @@ import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.baseresumes.BaseResumeResponseDto;
 import com.jordanfulawka.parsewell.service.BaseResumeService;
 import com.jordanfulawka.parsewell.service.s3.S3Service;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,12 @@ public class BaseResumeRestController {
     }
 
     @GetMapping("/me")
-    public BaseResumeResponseDto getMyBaseResume(@AuthenticationPrincipal UserDetails userDetails) {
-        return baseResumeService.getBaseResumeForUser(userDetails.getUsername());
+    public ResponseEntity<BaseResumeResponseDto> getMyBaseResume(@AuthenticationPrincipal UserDetails userDetails) {
+        BaseResumeResponseDto baseResume = baseResumeService.getBaseResumeForUser(userDetails.getUsername());
+        if(baseResume == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(baseResume);
     }
 
     @PutMapping("/me")

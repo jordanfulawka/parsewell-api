@@ -57,7 +57,6 @@ public class ApplicationServiceImpl implements ApplicationService{
     @Override
     public ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto) {
 
-        System.out.println(applicationRequestDto);
 
         User user = userRepository.findById(applicationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         BaseResume baseResume = baseResumeRepository.findById(applicationRequestDto.getBaseResumeId()).orElseThrow(() -> new EntityNotFoundException("Base resume not found"));
@@ -212,7 +211,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
 
         finalMaterial.setResumeFilename(dto.fileName());
-        finalMaterial.setResumeKey("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/resume.pdf");
+        finalMaterial.setResumeKey("users/" + user.getId() + "/applications/" + String.valueOf(applicationId) + "/resume.pdf");
         finalMaterialRepository.save(finalMaterial);
 
         return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
@@ -231,7 +230,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
 
         finalMaterial.setCoverLetterFilename(dto.fileName());
-        finalMaterial.setCoverLetterKey("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/coverLetter.pdf");
+        finalMaterial.setCoverLetterKey("users/" + user.getId() + "/applications/" + String.valueOf(applicationId) + "/coverLetter.pdf");
         finalMaterialRepository.save(finalMaterial);
 
         return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());

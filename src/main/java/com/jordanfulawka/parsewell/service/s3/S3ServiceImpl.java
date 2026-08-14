@@ -35,6 +35,8 @@ public class S3ServiceImpl implements S3Service {
         this.userRepository = userRepository;
     }
 
+//    users/userId/baseResume.pdf
+
 
     @Override
     public String createPresignedPutUrl(String email) {
@@ -43,7 +45,8 @@ public class S3ServiceImpl implements S3Service {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
-                    .key("resumes/" + user.getId() + "/base-resume.pdf")
+//                    .key("resumes/" + user.getId() + "/base-resume.pdf")
+                    .key("users/" + user.getId() + "/baseResume.pdf")
                     .build();
 
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -68,7 +71,7 @@ public class S3ServiceImpl implements S3Service {
 
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
-                    .key("resumes/" + user.getId() + "/base-resume.pdf")
+                    .key("users/" + user.getId() + "/baseResume.pdf")
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -87,6 +90,8 @@ public class S3ServiceImpl implements S3Service {
         }
     }
 
+    //    users/userId/applications/applicationId/resume.pdf/coverLetter.pdf
+
     @Override
     public String createPresignedGetUrl(String email, UUID applicationId, String type) {
         User user = userRepository.findByEmail(email);
@@ -94,7 +99,8 @@ public class S3ServiceImpl implements S3Service {
         try {
             GetObjectRequest objectRequest = GetObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
-                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + ".pdf")
+//                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + ".pdf")
+                    .key("users/" + user.getId() + "/applications/" + String.valueOf(applicationId) + "/" + type + ".pdf")
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -117,7 +123,7 @@ public class S3ServiceImpl implements S3Service {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
                     .bucket("parsewell-material-uploads")
-                    .key("final-materials/" + user.getId() + "/" + String.valueOf(applicationId) + "/" + type + ".pdf")
+                    .key("users/" + user.getId() + "/applications/" + String.valueOf(applicationId) + "/" + type + ".pdf")
                     .build();
 
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()

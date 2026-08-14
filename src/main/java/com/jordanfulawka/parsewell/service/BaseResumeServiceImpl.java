@@ -7,7 +7,6 @@ import com.jordanfulawka.parsewell.repository.BaseResumeRepository;
 import com.jordanfulawka.parsewell.repository.UserRepository;
 import com.jordanfulawka.parsewell.service.jobposting.PdfTextExtractor;
 import com.jordanfulawka.parsewell.service.s3.S3Service;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +35,7 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     public BaseResumeResponseDto createBaseResumeFromFile(String email, String fileName) throws IOException {
 
         User user = userRepository.findByEmail(email);
-        String s3Key = "resumes/" + user.getId() + "/base-resume.pdf";
+        String s3Key = "users/" + user.getId() + "/baseResume.pdf";
 
         byte[] pdfBytes = s3Service.downloadObject(s3Key);
         String content = pdfTextExtractor.extractText(pdfBytes);
@@ -59,8 +58,8 @@ public class BaseResumeServiceImpl implements BaseResumeService{
     @Override
     public BaseResumeResponseDto getBaseResumeForUser(String email) {
         BaseResume baseResume = baseResumeRepository.findByUser_Email(email);
-        if(baseResume == null) {
-            throw new EntityNotFoundException("Base resume not found for user with email: " + email);
+        if (baseResume == null) {
+            return null;
         }
         return mapToResponse(baseResume);
     }
