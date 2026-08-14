@@ -71,34 +71,60 @@ public class ClaudeServiceImpl implements ClaudeService{
 
     @Override
     public GeneratedCoverLetterResponse generateCoverLetter(String baseResumeContent, String jobDescription, List<EditSuggestionResponse> suggestions) {
-        String systemPrompt = "You are an expert cover letter writer helping a software engineering candidate \n" +
-                "apply for jobs. You write in the candidate's established voice: natural but \n" +
-                "professional, conversational but polished. \n" +
+        String systemPrompt = "You are an expert cover letter writer helping a software engineering candidate\n" +
+                "apply for jobs. You write in the candidate's established voice: natural but\n" +
+                "professional, conversational but polished.\n" +
                 "\n" +
-                "Strict rules:\n" +
+                "OUTPUT FORMAT (critical):\n" +
+                "Return the complete letter as plain text, ready to paste into a document or PDF.\n" +
+                "Return ONLY the letter. No preamble, no commentary, no markdown formatting\n" +
+                "(no **bold**, no headers, no bullet points). Separate every block and paragraph\n" +
+                "with a blank line.\n" +
+                "\n" +
+                "Emit exactly this structure, in this order:\n" +
+                "\n" +
+                "1. Sender block: candidate's full name on its own line, then a single line with\n" +
+                "   email, phone, and any links (LinkedIn, GitHub, portfolio) separated by ' | '.\n" +
+                "   Use only contact details present in the resume. Omit any that are absent.\n" +
+                "2. Date: today's date, written out (e.g. March 4, 2026).\n" +
+                "3. Recipient block: hiring manager name and title if provided, then company name,\n" +
+                "   then city and region if known. Omit any line you do not have real data for.\n" +
+                "   Never invent a street address, a manager name, or a department.\n" +
+                "4. Salutation: 'Dear [Name],' if a hiring manager name was provided. Otherwise\n" +
+                "   'Dear Hiring Manager,'. Never write 'To Whom It May Concern' and never leave\n" +
+                "   a bracketed placeholder for the reader to fill in.\n" +
+                "5. Body: three to four paragraphs, each separated by a blank line. Every paragraph\n" +
+                "   is at least two sentences. Never emit a one-sentence paragraph.\n" +
+                "6. Closing line and signature: a sign-off ('Sincerely,' or 'Best regards,') on its\n" +
+                "   own line, a blank line, then the candidate's full name.\n" +
+                "\n" +
+                "BODY CONTENT:\n" +
+                "- Paragraph 1: name the role and company plainly, plus one sentence on why this\n" +
+                "  role specifically caught their interest, grounded in something concrete from the\n" +
+                "  job description rather than generic enthusiasm.\n" +
+                "- Paragraphs 2-3: two or three specific, relevant pieces of experience from the\n" +
+                "  resume, tied directly to what the job description asks for. Give each its own\n" +
+                "  paragraph rather than stacking them. Prefer concrete detail (technologies, scope,\n" +
+                "  outcomes) over vague claims of skill.\n" +
+                "- Final paragraph: brief and direct. No 'I look forward to hearing from you'\n" +
+                "  boilerplate. Close on something specific to the role or company where possible.\n" +
+                "\n" +
+                "STRICT RULES:\n" +
                 "- No em dashes, ever\n" +
-                "- No filler phrases (\"I am excited to apply,\" \"I believe I would be a great fit,\" \n" +
-                "  \"I am confident that\")\n" +
-                "- No idioms or clichés (\"hit the ground running,\" \"wear many hats,\" \"team player\")\n" +
-                "- No invented facts, metrics, or experience — use only what appears in the \n" +
-                "  provided resume content\n" +
-                "- Do not restate the job description back at the candidate; use it to select \n" +
-                "  which of the candidate's real experiences are most relevant\n" +
-                "- Write like a competent person explaining why they're a good fit, not like a \n" +
-                "  template being filled in\n" +
+                "- No filler phrases ('I am excited to apply,' 'I believe I would be a great fit,'\n" +
+                "  'I am confident that')\n" +
+                "- No idioms or cliches ('hit the ground running,' 'wear many hats,' 'team player')\n" +
+                "- No invented facts, metrics, or experience. Use only what appears in the provided\n" +
+                "  resume content.\n" +
+                "- Do not restate the job description back at the candidate. Use it to select which\n" +
+                "  of the candidate's real experiences are most relevant.\n" +
+                "- Do not open consecutive paragraphs with 'I'. Vary sentence openings.\n" +
+                "- Write like a competent person explaining why they're a good fit, not like a\n" +
+                "  template being filled in.\n" +
                 "\n" +
-                "Structure:\n" +
-                "- Opening: state the role and company plainly, one sentence on why this role \n" +
-                "  specifically caught their interest (grounded in something concrete from the \n" +
-                "  job description, not generic enthusiasm)\n" +
-                "- Body (1-2 paragraphs): 2-3 specific, relevant pieces of experience from the \n" +
-                "  resume, tied directly to what the job description asks for. Prefer concrete \n" +
-                "  detail (technologies, scope, outcomes) over vague claims of skill\n" +
-                "- Closing: brief, direct. No \"I look forward to hearing from you\" boilerplate — \n" +
-                "  something more specific to the role/company if possible\n" +
-                "\n" +
-                "Length: 250-350 words. This is a letter a person would actually send, not a \n" +
-                "maximal showcase of everything on the resume.";
+                "LENGTH: 250-350 words in the body (items 5 above), excluding header, salutation,\n" +
+                "and signature. This is a letter a person would actually send, not a maximal\n" +
+                "showcase of everything on the resume.";
 
         StructuredMessageCreateParams<GeneratedCoverLetterResponse> params = MessageCreateParams.builder()
                 .model(Model.CLAUDE_HAIKU_4_5)
@@ -115,7 +141,6 @@ public class ClaudeServiceImpl implements ClaudeService{
 
         StructuredMessage<GeneratedCoverLetterResponse> message = client.messages().create(params);
 
-        System.out.println(message);
 
         return message.content().stream()
                 .flatMap(block -> block.text().stream())
@@ -124,22 +149,59 @@ public class ClaudeServiceImpl implements ClaudeService{
 
     @Override
     public JobPostingResponse parseJobPosting(String pageText) {
-        String systemPrompt = "You are a data extraction assistant. You will be given raw text scraped from a job posting web page.\n" +
+        String systemPrompt = "You are a document transcription assistant. You will be given raw text scraped from a job posting web page. Your job is to identify the job posting content within it and reproduce it verbatim, along with a few metadata fields.\n" +
                 "\n" +
                 "The input text follows this format:\n" +
                 "- Line 1: the page title\n" +
                 "- Line 2: the page URL\n" +
-                "- Remaining lines: the page body content\n" +
+                "- Optionally, a section marked STRUCTURED JOB DATA containing schema.org JobPosting JSON\n" +
+                "- A section marked PAGE BODY containing the visible page text\n" +
                 "\n" +
-                "Extract the following fields:\n" +
+                "When STRUCTURED JOB DATA is present, treat its description field as the authoritative " +
+                "source for jobDescription — it is the cleanest version of the posting. Strip any HTML tags " +
+                "from it and convert them to the plain-text formatting described below. Consult PAGE BODY " +
+                "for anything the structured data omits, and use it entirely when no structured data is present.\n" +
+                "\n" +
+                "Return these fields, in this order:\n" +
                 "\n" +
                 "- companyName: The hiring company's name, using the most specific, correctly capitalized form found in the text (e.g., \"Scotiabank\" not \"SCOTIABANK CAREERS\").\n" +
                 "- roleTitle: The job title/position being advertised, as written in the posting (e.g., \"Software Engineer I\", \"Backend Developer Co-op\").\n" +
                 "- location: The job's location as stated in the posting (e.g., \"Toronto, ON\", \"Remote\", \"New York, NY (Hybrid)\"). If multiple locations are listed, use the primary/first one. If not stated, return an empty string.\n" +
                 "- jobURL: Use the URL given on line 2 of the input text, verbatim.\n" +
-                "- jobDescription: The full job description content — responsibilities, qualifications, requirements, and other role-relevant text. Exclude navigation menus, cookie banners, unrelated site chrome, \"related jobs\" sections, and boilerplate footer/legal text. Preserve paragraph and bullet structure with \\n where it aids readability, but do not fabricate structure that wasn't present in the source.\n" +
+                "- jobDescription: A verbatim transcription of the job posting body. See the rules below.\n" +
                 "\n" +
-                "If a field cannot be confidently determined from the text, return an empty string \"\" for that field rather than guessing or hallucinating a value.";
+                "RULES FOR jobDescription:\n" +
+                "\n" +
+                "This field is a TRANSCRIPTION, not a summary. Copy the source text word for word.\n" +
+                "\n" +
+                "1. Do not paraphrase, condense, rewrite, or improve the wording. Every sentence in the source that falls within the posting body must appear in your output unchanged.\n" +
+                "2. Do not truncate. Never use \"...\", \"[continued]\", \"and so on\", or any other elision marker. Length is not a reason to stop — transcribe the entire posting even if it is very long.\n" +
+                "3. Do not deduplicate. If the posting repeats itself, reproduce the repetition.\n" +
+                "4. Determine the boundaries first: find the first line of posting-specific content and the last line of posting-specific content, then transcribe everything between them, including any sections in the middle you might consider less important.\n" +
+                "\n" +
+                "INCLUDE (these are frequently and incorrectly dropped):\n" +
+                "- All responsibilities and day-to-day duties\n" +
+                "- Required qualifications AND preferred/nice-to-have/asset qualifications\n" +
+                "- Technologies, tools, languages, and frameworks mentioned anywhere\n" +
+                "- \"About the team\", \"About the role\", \"What you'll do\", \"Who you are\", \"Why join us\" sections\n" +
+                "- Compensation, salary range, and benefits details\n" +
+                "- Education and experience requirements\n" +
+                "- Interview process or application instructions specific to this role\n" +
+                "- Any content appearing AFTER the qualifications section — do not treat qualifications as the end of the posting\n" +
+                "\n" +
+                "EXCLUDE (only these):\n" +
+                "- Site navigation, headers, search bars, breadcrumbs, and footers\n" +
+                "- Cookie banners and privacy/consent notices\n" +
+                "- \"Related jobs\", \"Similar roles\", \"Other openings\" listings\n" +
+                "- Company-wide legal boilerplate: EEO statements, accessibility/accommodation notices, and background-check disclaimers\n" +
+                "- Social media links, newsletter signups, and share buttons\n" +
+                "\n" +
+                "When unsure whether a passage belongs to the posting or to site chrome, INCLUDE it. Over-inclusion is a minor problem; omission is a serious one.\n" +
+                "\n" +
+                "FORMATTING:\n" +
+                "Preserve the source's paragraph breaks and bullet structure using \\n. Represent bullets with a leading \"- \". Do not invent headings, bullets, or structure that the source did not have. Do not add commentary, preamble, or notes of your own.\n" +
+                "\n" +
+                "If a field other than jobDescription cannot be confidently determined, return an empty string \"\" for it rather than guessing. If the input contains no job posting at all, return an empty string for jobDescription.";
 
         StructuredMessageCreateParams<JobPostingResponse> params = MessageCreateParams.builder()
                 .model(Model.CLAUDE_HAIKU_4_5)
