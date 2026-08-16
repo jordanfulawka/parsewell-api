@@ -63,4 +63,14 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(status).body(new ApiExceptionResponse(status.value(), message, System.currentTimeMillis()));
     }
 
+    @ExceptionHandler(RestrictedAccessException.class)
+    public ResponseEntity<ApiExceptionResponse> handleRestrictedAccess(RestrictedAccessException e) {
+        ApiExceptionResponse error = new ApiExceptionResponse();
+        error.setTimestamp(System.currentTimeMillis());
+        error.setStatus(HttpStatus.FORBIDDEN.value());
+        error.setError(e.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
 }

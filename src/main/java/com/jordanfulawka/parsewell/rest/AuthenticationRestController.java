@@ -5,10 +5,12 @@ import com.jordanfulawka.parsewell.dto.authentication.CheckJwtValidationRequest;
 import com.jordanfulawka.parsewell.dto.authentication.CheckJwtValidationResponse;
 import com.jordanfulawka.parsewell.entity.User;
 import com.jordanfulawka.parsewell.exception.InvalidCredentialsException;
+import com.jordanfulawka.parsewell.exception.RestrictedAccessException;
 import com.jordanfulawka.parsewell.exception.UserAlreadyExistsException;
 import com.jordanfulawka.parsewell.repository.UserRepository;
 import com.jordanfulawka.parsewell.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,9 @@ public class AuthenticationRestController {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private JwtUtil jwtUtil;
+
+    @Value("${signup.allowedEmail}")
+    private String allowedEmail;
 
     @Autowired
     public AuthenticationRestController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
@@ -55,6 +60,7 @@ public class AuthenticationRestController {
 
     @PostMapping("/signup")
     public AuthResponse registerUser(@RequestBody User user) {
+        if(!user.getEmail().equals(allowedEmail)) throw new RestrictedAccessException("Public signups are not allowed at this time.");
         if(userRepository.existsByEmail(user.getEmail())) {
 //            return new AuthResponse(null, "User already exists");
             throw new UserAlreadyExistsException("A user with this email already exists");
