@@ -27,26 +27,42 @@ public class ClaudeServiceImpl implements ClaudeService{
 
         String systemPrompt = "You are an expert resume editor helping a software engineering candidate tailor their resume to a specific job posting. You produce exact, prescriptive edits — never vague advice.\n" +
                 "\n" +
-                "GRANULARITY RULE (critical — read first):\n" +
-                "- Every edit suggestion operates on exactly ONE bullet point. Never combine multiple bullets into a single beforeText/afterText pair, even if they're in the same job section and even if several bullets in that section could use similar changes.\n" +
+                "EDIT TYPES (field contract — applies to every suggestion):\n" +
+                "- REPLACE: rewrite an existing bullet. beforeText = the exact existing bullet text. afterText = its replacement. This should be the large majority of suggestions.\n" +
+                "- ADD: insert a bullet that does not currently exist. beforeText = \"\" (empty string). afterText = the new bullet. Use only when the base resume genuinely supports the content and no existing bullet can be reframed to cover it.\n" +
+                "- REMOVE: delete an existing bullet. beforeText = the exact existing bullet text. afterText = \"\" (empty string). Use sparingly, only when a bullet actively hurts relevance for this posting.\n" +
+                "- SUMMARY: see the SUMMARY LINE section below.\n" +
+                "For bullet-level edits, default to REPLACE until the JD really warrants something being added.\n" +
+                "\n" +
+                "GRANULARITY RULE (applies to all bullet-level edits — read first):\n" +
+                "- Every edit suggestion operates on exactly ONE bullet point, wherever it may lie in the resume. Never combine multiple bullets into a single beforeText/afterText pair, even if they're in the same job section and even if several bullets in that section could use similar changes.\n" +
                 "- beforeText must be the literal text of one bullet only — no embedded newlines, no concatenation of adjacent bullets.\n" +
                 "- afterText must be the rewritten version of that same single bullet, replacing that bullet only.\n" +
                 "- If two bullets in the same section both need edits, emit two separate entries in editSuggestions, each pointing at its own bullet.\n" +
                 "- Before finalizing, self-check: does beforeText contain more than one \"•\"? If yes, split it into separate suggestions before returning.\n" +
                 "\n" +
+                "SUMMARY LINE (special case, exempt from the granularity rule above):\n" +
+                "- In addition to bullet edits, you must evaluate whether the resume's summary (or lack of one) is a strong opportunity for this JD, and if so emit exactly one \"SUMMARY\" suggestion for a professional summary at the top of the resume. Only skip it if an existing summary is already excellent for this specific posting.\n" +
+                "- For this suggestion only, beforeText is the empty string if the resume has no existing summary. If the resume already contains a summary line, beforeText must be that exact line.\n" +
+                "- afterText is the complete summary: one or two sentences, 30 words maximum.\n" +
+                "- Structure: role identity, then two or three concrete technologies drawn from the resume, then scope of experience. No adjectives about character or motivation. Banned words: passionate, motivated, driven, results-oriented, dynamic, innovative, proven.\n" +
+                "- Every fact in the summary must appear elsewhere in the base resume. The job description determines which existing facts to emphasize, never what to claim.\n" +
+                "- Emit exactly ONE suggestion with editType \"SUMMARY\" for a professional summary at the top of the resume. Do not emit more than one.\n" +
+                "\n" +
                 "CORE RULES (non-negotiable):\n" +
                 "1. NEVER invent experience, skills, metrics, or achievements that aren't grounded in the base resume. You may rephrase, reframe, quantify with numbers the user already provided elsewhere in the resume, or surface existing but underemphasized details — but you cannot fabricate.\n" +
-                "2. If the JD asks for something the resume genuinely doesn't support (e.g. a technology never mentioned), do NOT force an edit to fake it. Skip it, or if relevant, note the gap via a low-priority \"ADD\" suggestion that only rewords an adjacent real experience — never a fictional one.\n" +
-                "3. Every \"afterText\" must be something the user could paste directly into their LaTeX resume in place of the single bullet it replaces, with zero further editing.\n" +
-                "4. Prefer specific, concrete language over generic buzzwords. If the JD uses specific terminology (e.g. \"distributed systems,\" \"CI/CD,\" \"stakeholder management\"), mirror that language where it's honestly applicable.\n" +
-                "5. Prioritize edits by impact: the first items in the array should be the changes most likely to affect callback rate (strongest keyword/skill alignment, most senior-sounding reframe of real work), not just the first section of the resume.\n" +
-                "6. Do not touch bullets that are already strong matches for the JD — only suggest edits where there's a real gap or improvement opportunity for that specific bullet. Fewer, higher-quality edits beat padding the list.\n" +
+                "2. Frame aggressively within the truth. Use the strongest verb the work honestly supports (architected, built, deployed — not helped with, assisted, worked on). Name scale, users, and system boundaries wherever the resume provides them. If a bullet describes implementation detail, surface the architectural decision behind it. Under-selling real work is as much a failure as overstating it.\n" +
+                "3. If the JD asks for something the resume genuinely doesn't support (e.g. a technology never mentioned), do NOT force an edit to fake it. Skip it, or if relevant, note the gap via a low-priority \"ADD\" suggestion that only rewords an adjacent real experience — never a fictional one.\n" +
+                "4. Every \"afterText\" must be something the user could paste directly into their LaTeX resume in place of the single bullet it replaces, with zero further editing.\n" +
+                "5. Prefer specific, concrete language over generic buzzwords. If the JD uses specific terminology (e.g. \"distributed systems,\" \"CI/CD,\" \"stakeholder management\"), mirror that language where it's honestly applicable.\n" +
+                "6. Prioritize edits by impact: the first items in the array should be the changes most likely to affect callback rate (strongest keyword/skill alignment, most senior-sounding reframe of real work), not just the first section of the resume.\n" +
+//                "7. Do not touch bullets that are already strong matches for the JD — only suggest edits where there's a real gap or improvement opportunity for that specific bullet. Fewer, higher-quality edits beat padding the list.\n" +
                 "7. Write in the user's established voice: natural, professional, conversational-technical. No em dashes. No filler phrases (\"proven track record,\" \"results-driven,\" \"passionate about\").\n" +
                 "\n" +
                 "If, after honest analysis, there are no meaningful edits to suggest (the resume already strongly matches), return an empty editSuggestions array rather than inventing low-value changes.";
 
         StructuredMessageCreateParams<EditSuggestionsResponse> params = MessageCreateParams.builder()
-                .model(Model.CLAUDE_HAIKU_4_5)
+                .model(Model.CLAUDE_SONNET_5)
                 .maxTokens(4096L)
                 .systemOfTextBlockParams(List.of(
                         TextBlockParam.builder()
@@ -127,7 +143,7 @@ public class ClaudeServiceImpl implements ClaudeService{
                 "showcase of everything on the resume.";
 
         StructuredMessageCreateParams<GeneratedCoverLetterResponse> params = MessageCreateParams.builder()
-                .model(Model.CLAUDE_HAIKU_4_5)
+                .model(Model.CLAUDE_SONNET_5)
                 .maxTokens(4096L)
                 .systemOfTextBlockParams(List.of(
                         TextBlockParam.builder()
@@ -174,11 +190,11 @@ public class ClaudeServiceImpl implements ClaudeService{
                 "\n" +
                 "This field is a TRANSCRIPTION, not a summary. Copy the source text word for word.\n" +
                 "\n" +
-                "1. Do not paraphrase, condense, rewrite, or improve the wording. Every sentence in the source that falls within the posting body must appear in your output unchanged.\n" +
-                "2. Do not truncate. Never use \"...\", \"[continued]\", \"and so on\", or any other elision marker. Length is not a reason to stop — transcribe the entire posting even if it is very long.\n" +
-                "3. Do not deduplicate. If the posting repeats itself, reproduce the repetition.\n" +
-                "4. Determine the boundaries first: find the first line of posting-specific content and the last line of posting-specific content, then transcribe everything between them, including any sections in the middle you might consider less important.\n" +
-                "\n" +
+//                "1. Do not paraphrase, condense, rewrite, or improve the wording. Every sentence in the source that falls within the posting body must appear in your output unchanged.\n" +
+//                "2. Do not truncate. Never use \"...\", \"[continued]\", \"and so on\", or any other elision marker. Length is not a reason to stop — transcribe the entire posting even if it is very long.\n" +
+//                "3. Do not deduplicate. If the posting repeats itself, reproduce the repetition.\n" +
+//                "4. Determine the boundaries first: find the first line of posting-specific content and the last line of posting-specific content, then transcribe everything between them, including any sections in the middle you might consider less important.\n" +
+//                "\n" +
                 "INCLUDE (these are frequently and incorrectly dropped):\n" +
                 "- All responsibilities and day-to-day duties\n" +
                 "- Required qualifications AND preferred/nice-to-have/asset qualifications\n" +
@@ -204,7 +220,7 @@ public class ClaudeServiceImpl implements ClaudeService{
                 "If a field other than jobDescription cannot be confidently determined, return an empty string \"\" for it rather than guessing. If the input contains no job posting at all, return an empty string for jobDescription.";
 
         StructuredMessageCreateParams<JobPostingResponse> params = MessageCreateParams.builder()
-                .model(Model.CLAUDE_HAIKU_4_5)
+                .model(Model.CLAUDE_SONNET_5)
                 .maxTokens(4096L)
                 .systemOfTextBlockParams(List.of(
                         TextBlockParam.builder()

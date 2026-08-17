@@ -16,7 +16,7 @@ public class EditSuggestionAiResponseDto {
     @JsonPropertyDescription("One sentence tying this edit to a specific part of the job description")
     private String reason;
 
-    @JsonPropertyDescription("One of: REPLACE, ADD, REMOVE")
+    @JsonPropertyDescription("One of: REPLACE, ADD, REMOVE, SUMMARY")
     private String editType;
 
     @JsonPropertyDescription("Priority order, starting at 0. Most impactful edits first.")

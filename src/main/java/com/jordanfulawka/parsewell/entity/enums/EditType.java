@@ -5,5 +5,6 @@ public enum EditType {
     ADD,
     REMOVE,
     REORDER,
-    OTHER
+    OTHER,
+    SUMMARY
 }
