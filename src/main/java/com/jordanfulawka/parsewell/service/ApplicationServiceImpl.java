@@ -71,7 +71,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setJobURL(applicationRequestDto.getJobURL());
         application.setJobDescription(applicationRequestDto.getJobDescription());
         application.setApplicationChannel(applicationRequestDto.getApplicationChannel());
-        application.setApplicationStatus(ApplicationStatus.APPLIED);
+        application.setApplicationStatus(ApplicationStatus.DRAFT);
         application.setNotes(applicationRequestDto.getNotes());
 
         application = applicationRepository.save(application);
