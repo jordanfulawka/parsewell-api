@@ -54,6 +54,11 @@ public class ApplicationRestController {
         return applicationService.findById(id);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable UUID id) {
+        applicationService.deleteApplication(id);
+    }
+
     @GetMapping("/{id}/generate-edits")
     public List<EditSuggestionResponse> generateEdits(@PathVariable UUID id) {
         return applicationService.generateEditSuggestions(id);

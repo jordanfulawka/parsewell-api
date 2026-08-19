@@ -4,7 +4,9 @@ import com.jordanfulawka.parsewell.entity.enums.ApplicationChannel;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,10 +45,12 @@ public class Application {
     private String jobDescription;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="application_channel")
     private ApplicationChannel applicationChannel;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="application_status")
     private ApplicationStatus applicationStatus;
 

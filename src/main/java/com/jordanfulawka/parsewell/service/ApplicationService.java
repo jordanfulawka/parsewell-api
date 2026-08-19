@@ -16,6 +16,7 @@ import java.util.UUID;
 public interface ApplicationService {
     ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto);
     ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails);
+    void deleteApplication(UUID applicationId);
     List<ApplicationResponseDto> getAllApplications(String email);
     List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId);
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);

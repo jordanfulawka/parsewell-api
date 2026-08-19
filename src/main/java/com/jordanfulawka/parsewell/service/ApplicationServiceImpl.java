@@ -100,6 +100,12 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
+    public void deleteApplication(UUID applicationId) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new EntityNotFoundException("Application not found"));
+        applicationRepository.delete(application);
+    }
+
+    @Override
     public List<ApplicationResponseDto> getAllApplications(String email) {
         User user = userRepository.findByEmail(email);
         List<Application> applications = applicationRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId());

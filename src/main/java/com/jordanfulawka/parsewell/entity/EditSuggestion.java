@@ -2,6 +2,8 @@ package com.jordanfulawka.parsewell.entity;
 
 import com.jordanfulawka.parsewell.entity.enums.EditType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class EditSuggestion {
     private String reason;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="edit_type")
     private EditType editType;
 
