@@ -50,7 +50,7 @@ public class Application {
     @Column(name="application_status")
     private ApplicationStatus applicationStatus;
 
-    @Column(name="notes")
+    @Column(name="notes", columnDefinition = "text")
     private String notes;
 
     @CreationTimestamp

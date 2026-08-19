@@ -32,7 +32,7 @@ public class FinalMaterial {
     private String coverLetterFilename;
 
     @UpdateTimestamp
-    @Column(name="last_updated")
+    @Column(name="updated_at")
     private LocalDateTime uploadedAt;
 
     public FinalMaterial() {}
