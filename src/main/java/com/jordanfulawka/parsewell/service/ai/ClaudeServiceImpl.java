@@ -126,7 +126,7 @@ public class ClaudeServiceImpl implements ClaudeService{
                 - Do not restate the JD back at the candidate. Use it to select which real experiences are most relevant.
                 - Do not open consecutive paragraphs with "I". Vary sentence openings.
             
-                LENGTH: 250-350 words in the body, excluding header, salutation, and signature.
+                LENGTH: 250-350 words in the body, excluding header, salutation, and signature. It should be no longer than a standard Google Doc page.
                 """;
 
         StructuredMessageCreateParams<GeneratedCoverLetterResponse> params = MessageCreateParams.builder()

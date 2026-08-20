@@ -93,7 +93,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         applicationRequestDto.setCompanyName(jobPostingResponse.getCompanyName());
         applicationRequestDto.setRoleTitle(jobPostingResponse.getRoleTitle());
         applicationRequestDto.setLocation(jobPostingResponse.getLocation());
-        applicationRequestDto.setJobURL(jobPostingResponse.getJobUrl());
+        applicationRequestDto.setJobURL(jobPostingResponse.getJobURL());
         applicationRequestDto.setJobDescription(jobPostingResponse.getJobDescription());
 
         return applicationRequestDto;

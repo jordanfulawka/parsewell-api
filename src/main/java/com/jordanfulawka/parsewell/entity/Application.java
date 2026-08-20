@@ -65,7 +65,7 @@ public class Application {
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<EditSuggestion> editSuggestions;
 
     @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)

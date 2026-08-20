@@ -14,18 +14,18 @@ public class JobPostingResponse {
     private String location;
 
     @JsonPropertyDescription("The exact job URL as given in the 'URL:' line of the input. Copy verbatim, do not modify or normalize")
-    private String jobUrl;
+    private String jobURL;
 
     @JsonPropertyDescription("The full job description text, cleaned of navigation/apply-button boilerplate.")
     private String jobDescription;
 
     public JobPostingResponse() {}
 
-    public JobPostingResponse(String companyName, String roleTitle, String location, String jobUrl, String jobDescription) {
+    public JobPostingResponse(String companyName, String roleTitle, String location, String jobURL, String jobDescription) {
         this.companyName = companyName;
         this.roleTitle = roleTitle;
         this.location = location;
-        this.jobUrl = jobUrl;
+        this.jobURL = jobURL;
         this.jobDescription = jobDescription;
     }
 
@@ -53,12 +53,12 @@ public class JobPostingResponse {
         this.location = location;
     }
 
-    public String getJobUrl() {
-        return jobUrl;
+    public String getJobURL() {
+        return jobURL;
     }
 
-    public void setJobUrl(String jobUrl) {
-        this.jobUrl = jobUrl;
+    public void setJobURL(String jobURL) {
+        this.jobURL = jobURL;
     }
 
     public String getJobDescription() {
@@ -75,7 +75,7 @@ public class JobPostingResponse {
                 "companyName='" + companyName + '\'' +
                 ", roleTitle='" + roleTitle + '\'' +
                 ", location='" + location + '\'' +
-                ", jobUrl='" + jobUrl + '\'' +
+                ", jobUrl='" + jobURL + '\'' +
                 ", jobDescription='" + jobDescription + '\'' +
                 '}';
     }
