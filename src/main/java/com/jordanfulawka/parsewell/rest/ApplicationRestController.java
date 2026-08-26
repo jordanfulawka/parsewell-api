@@ -9,6 +9,8 @@ import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
 import com.jordanfulawka.parsewell.dto.finalmaterials.ResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.service.ApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/applications")
 public class ApplicationRestController {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationRestController.class);
     private ApplicationService applicationService;
 
     @Autowired
@@ -67,6 +70,11 @@ public class ApplicationRestController {
     @GetMapping("/{id}/edits")
     public List<EditSuggestionResponse> getEditSuggestions(@PathVariable UUID id) {
         return applicationService.getEditSuggestionByApplicationId(id);
+    }
+
+    @DeleteMapping("/{id}/edits")
+    public void deleteEditSuggestions(@PathVariable UUID id) {
+        applicationService.deleteEditSuggestionsByApplicationId(id);
     }
 
     @GetMapping("/{id}/generate-cover-letter")

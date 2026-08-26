@@ -275,6 +275,12 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
+    public void deleteEditSuggestionsByApplicationId(UUID applicationId) {
+        List<EditSuggestion> editSuggestions = editSuggestionRepository.findAllByApplicationId(applicationId);
+        editSuggestionRepository.deleteAll(editSuggestions);
+    }
+
+    @Override
     public ApplicationResponseDto updateApplication(ApplicationResponseDto dto) {
 
         Application application = applicationRepository.findById(dto.id()).orElseThrow(() -> new EntityNotFoundException("Application cannot be found"));
