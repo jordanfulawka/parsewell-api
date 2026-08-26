@@ -176,6 +176,12 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
+    public void deleteCoverLetter(UUID applicationId) {
+        GeneratedCoverLetter generatedCoverLetter = generatedCoverLetterRepository.findByApplicationId(applicationId);
+        generatedCoverLetterRepository.delete(generatedCoverLetter);
+    }
+
+    @Override
     public GeneratedCoverLetterResponse getCoverLetterByApplicationId(UUID applicationId) {
         GeneratedCoverLetter generatedCoverLetter = generatedCoverLetterRepository.findByApplicationId(applicationId);
 

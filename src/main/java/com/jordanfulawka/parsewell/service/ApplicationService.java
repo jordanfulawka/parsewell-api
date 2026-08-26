@@ -20,6 +20,7 @@ public interface ApplicationService {
     List<ApplicationResponseDto> getAllApplications(String email);
     List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId);
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);
+    void deleteCoverLetter(UUID applicationId);
     GeneratedCoverLetterResponse getCoverLetterByApplicationId(UUID applicationId);
     FinalMaterialDto saveFinalMaterials(UUID applicationId, FinalMaterialDto finalMaterialDto);
     ApplicationResponseDto findById(UUID applicationId);

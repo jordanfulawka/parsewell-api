@@ -87,6 +87,11 @@ public class ApplicationRestController {
         return applicationService.getCoverLetterByApplicationId(id);
     }
 
+    @DeleteMapping("/{id}/cover-letter")
+    public void deleteCoverLetter(@PathVariable UUID id) {
+        applicationService.deleteCoverLetter(id);
+    }
+
     @PostMapping("/{id}/upload-final-materials")
     public FinalMaterialDto uploadFinalMaterials(@PathVariable UUID id, @RequestBody FinalMaterialDto finalMaterialDto) {
         return applicationService.saveFinalMaterials(id, finalMaterialDto);
