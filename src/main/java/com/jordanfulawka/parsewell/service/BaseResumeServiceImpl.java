@@ -68,7 +68,7 @@ public class BaseResumeServiceImpl implements BaseResumeService{
         return new BaseResumeResponseDto(
                 baseResume.getId(), baseResume.getUser().getId(),
                 baseResume.getContent(), baseResume.getFileName(),
-                baseResume.getOriginalFileURL(), baseResume.getCreatedAt()
+                baseResume.getOriginalFileURL(), baseResume.getCreatedAt(), baseResume.getUpdatedAt()
         );
     }
 }
