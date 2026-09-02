@@ -2,6 +2,7 @@ package com.jordanfulawka.parsewell.service;
 
 import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
 import com.jordanfulawka.parsewell.dto.finalmaterials.CoverLetterRequestDto;
@@ -32,4 +33,5 @@ public interface ApplicationService {
     FinalMaterialDto saveResume(UUID applicationId, ResumeRequestDto dto, String email);
     FinalMaterialDto saveCoverLetter(UUID applicationId, CoverLetterRequestDto dto, String email);
     FinalMaterialDto getFinalMaterials(UUID applicationId);
+    ApplicationsInsightsDto getInsights(String email);
 }

@@ -2,6 +2,7 @@ package com.jordanfulawka.parsewell.rest;
 
 import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
 import com.jordanfulawka.parsewell.dto.finalmaterials.CoverLetterRequestDto;
@@ -44,6 +45,11 @@ public class ApplicationRestController {
     @PostMapping("/create-request")
     public ApplicationRequestDto createApplicationRequest(@RequestBody JobPostingResponse jobPostingResponse, @AuthenticationPrincipal UserDetails userDetails) {
         return applicationService.createApplicationRequest(jobPostingResponse, userDetails);
+    }
+
+    @GetMapping("/insights")
+    public ApplicationsInsightsDto getInsights(@AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.getInsights(userDetails.getUsername());
     }
 
 

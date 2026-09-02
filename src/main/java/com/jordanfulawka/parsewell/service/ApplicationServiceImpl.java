@@ -2,10 +2,14 @@ package com.jordanfulawka.parsewell.service;
 
 import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationsByStatusDto;
+import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
-import com.jordanfulawka.parsewell.dto.finalmaterials.*;
+import com.jordanfulawka.parsewell.dto.finalmaterials.CoverLetterRequestDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.FinalMaterialDto;
+import com.jordanfulawka.parsewell.dto.finalmaterials.ResumeRequestDto;
 import com.jordanfulawka.parsewell.dto.jobpostings.JobPostingResponse;
 import com.jordanfulawka.parsewell.entity.*;
 import com.jordanfulawka.parsewell.entity.enums.ApplicationStatus;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -257,6 +262,39 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
 
         return new FinalMaterialDto(finalMaterial.getResumeKey(), finalMaterial.getResumeFilename(), finalMaterial.getCoverLetterKey(), finalMaterial.getCoverLetterFilename());
+    }
+
+    @Override
+    public ApplicationsInsightsDto getInsights(String email) {
+        User user = userRepository.findByEmail(email);
+        List<Application> applications = applicationRepository.findAllByUserId(user.getId());
+
+        int totalApplications = 0;
+        int applicationsInPastWeek = 0;
+        int numApplied = 0;
+        int numHeardBack = 0;
+        int numRejected = 0;
+        int numGhosted = 0;
+        int numOther = 0;
+        LocalDate lastWeek = LocalDate.now().minusWeeks(1);
+        for(Application application : applications) {
+            if(application.getApplicationStatus() != ApplicationStatus.DRAFT) {
+                totalApplications += 1;
+            }
+            if(application.getCreatedAt().toLocalDate().isAfter(lastWeek)) {
+                applicationsInPastWeek += 1;
+            }
+            switch(application.getApplicationStatus()) {
+                case ApplicationStatus.APPLIED -> numApplied += 1;
+                case ApplicationStatus.HEARD_BACK -> numHeardBack += 1;
+                case ApplicationStatus.REJECTED -> numRejected += 1;
+                case ApplicationStatus.GHOSTED -> numGhosted += 1;
+                default -> numOther += 1;
+            }
+        }
+
+        ApplicationsByStatusDto applicationsByStatus = new ApplicationsByStatusDto(numApplied, numHeardBack, numRejected, numGhosted, numOther);
+        return new ApplicationsInsightsDto(totalApplications, applicationsInPastWeek, applicationsByStatus);
     }
 
     @Override
