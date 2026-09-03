@@ -1,5 +1,6 @@
 package com.jordanfulawka.parsewell.rest;
 
+import com.jordanfulawka.parsewell.dto.applications.ApplicationDTO;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
@@ -33,7 +34,7 @@ public class ApplicationRestController {
     }
 
     @GetMapping("")
-    public List<ApplicationResponseDto> getApplications(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<ApplicationDTO> getApplications(@AuthenticationPrincipal UserDetails userDetails) {
         return applicationService.getAllApplications(userDetails.getUsername());
     }
 

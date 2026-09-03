@@ -1,9 +1,6 @@
 package com.jordanfulawka.parsewell.service;
 
-import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
-import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
-import com.jordanfulawka.parsewell.dto.applications.ApplicationsByStatusDto;
-import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
+import com.jordanfulawka.parsewell.dto.applications.*;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionAiResponseDto;
 import com.jordanfulawka.parsewell.dto.editsuggestions.EditSuggestionResponse;
 import com.jordanfulawka.parsewell.dto.editsuggestions.GeneratedCoverLetterResponse;
@@ -23,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -111,17 +109,18 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public List<ApplicationResponseDto> getAllApplications(String email) {
+    public List<ApplicationDTO> getAllApplications(String email) {
         User user = userRepository.findByEmail(email);
-        List<Application> applications = applicationRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId());
+        List<ApplicationDTO> applications = applicationRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId());
 
-        List<ApplicationResponseDto> applicationResponses = new ArrayList<>();
-
-        for(Application application : applications) {
-            applicationResponses.add(mapToResponse(application));
-        }
-
-        return applicationResponses;
+        return applications;
+//        List<ApplicationResponseDto> applicationResponses = new ArrayList<>();
+//
+//        for(Application application : applications) {
+//            applicationResponses.add(mapToResponse(application));
+//        }
+//
+//        return applicationResponses;
     }
 
 
@@ -267,34 +266,33 @@ public class ApplicationServiceImpl implements ApplicationService{
     @Override
     public ApplicationsInsightsDto getInsights(String email) {
         User user = userRepository.findByEmail(email);
-        List<Application> applications = applicationRepository.findAllByUserId(user.getId());
+        LocalDateTime lastWeek = LocalDate.now().minusWeeks(1).atStartOfDay();
+        List<Object[]> insightsResponse = applicationRepository.getInsightsCounts(
+                user.getId(),
+                lastWeek,
+                ApplicationStatus.DRAFT,
+                ApplicationStatus.APPLIED,
+                ApplicationStatus.HEARD_BACK,
+                ApplicationStatus.REJECTED,
+                ApplicationStatus.GHOSTED
+        );
 
-        int totalApplications = 0;
-        int applicationsInPastWeek = 0;
-        int numApplied = 0;
-        int numHeardBack = 0;
-        int numRejected = 0;
-        int numGhosted = 0;
-        int numOther = 0;
-        LocalDate lastWeek = LocalDate.now().minusWeeks(1);
-        for(Application application : applications) {
-            if(application.getApplicationStatus() != ApplicationStatus.DRAFT) {
-                totalApplications += 1;
-            }
-            if(application.getCreatedAt().toLocalDate().isAfter(lastWeek)) {
-                applicationsInPastWeek += 1;
-            }
-            switch(application.getApplicationStatus()) {
-                case ApplicationStatus.APPLIED -> numApplied += 1;
-                case ApplicationStatus.HEARD_BACK -> numHeardBack += 1;
-                case ApplicationStatus.REJECTED -> numRejected += 1;
-                case ApplicationStatus.GHOSTED -> numGhosted += 1;
-                default -> numOther += 1;
-            }
-        }
+        Object[] insights = insightsResponse.getFirst();
+
+        int totalApplications = toInt(insights[0]);
+        int applicationsInPastWeek = toInt(insights[1]);
+        int numApplied = toInt(insights[2]);
+        int numHeardBack = toInt(insights[3]);
+        int numRejected = toInt(insights[4]);
+        int numGhosted = toInt(insights[5]);
+        int numOther = toInt(insights[6]);
 
         ApplicationsByStatusDto applicationsByStatus = new ApplicationsByStatusDto(numApplied, numHeardBack, numRejected, numGhosted, numOther);
         return new ApplicationsInsightsDto(totalApplications, applicationsInPastWeek, applicationsByStatus);
+    }
+
+    private int toInt(Object value) {
+        return value == null ? 0 : ((Number) value).intValue();
     }
 
     @Override

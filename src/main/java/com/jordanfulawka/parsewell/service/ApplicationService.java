@@ -1,5 +1,6 @@
 package com.jordanfulawka.parsewell.service;
 
+import com.jordanfulawka.parsewell.dto.applications.ApplicationDTO;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationRequestDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationResponseDto;
 import com.jordanfulawka.parsewell.dto.applications.ApplicationsInsightsDto;
@@ -18,7 +19,7 @@ public interface ApplicationService {
     ApplicationResponseDto createApplication(ApplicationRequestDto applicationRequestDto);
     ApplicationRequestDto createApplicationRequest(JobPostingResponse jobPostingResponse, UserDetails userDetails);
     void deleteApplication(UUID applicationId);
-    List<ApplicationResponseDto> getAllApplications(String email);
+    List<ApplicationDTO> getAllApplications(String email);
     List<EditSuggestionResponse> generateEditSuggestions(UUID applicationId);
     GeneratedCoverLetterResponse generateCoverLetter(UUID applicationId);
     void deleteCoverLetter(UUID applicationId);
